@@ -1,0 +1,72 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.player-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #121212, #242424);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+}
+
+.player-card {
+  width: 340px;
+  background: #1e1e1e;
+  padding: 25px;
+  border-radius: 20px;
+  text-align: center;
+  color: white;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+.album-cover {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  border-radius: 15px;
+  margin-bottom: 20px;
+}
+
+.player-card h2 {
+  margin-bottom: 5px;
+  font-size: 1.5rem;
+}
+
+.player-card p {
+  color: #b3b3b3;
+  margin-bottom: 20px;
+}
+
+.progress-bar {
+  width: 100%;
+  margin-bottom: 20px;
+  cursor: pointer;
+  accent-color: #1db954;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.controls button {
+  border: none;
+  background: #1db954;
+  color: white;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  font-size: 22px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.controls button:hover {
+  transform: scale(1.1);
+  background: #1ed760;
+}
