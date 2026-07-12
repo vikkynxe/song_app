@@ -6,21 +6,33 @@ function CreateAccount() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [file, setFile] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (password !== confirmPassword) {
       alert("Passwords do not match");
       return;
     }
-
-    console.log({
-      userId,
-      password,
-      file,
-    });
-
-    alert("Account Created Successfully!");
+  
+    const formData = new FormData();
+    formData.append("userId", userId);
+    formData.append("password", password);
+    formData.append("file", file);
+  
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/create_users", {
+        method: "POST",
+        body: formData,
+      });
+  
+      const data = await response.json();
+  
+      console.log(data);
+      alert("Account Created Successfully!");
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong");
+    }
   };
 
   return (

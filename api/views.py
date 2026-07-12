@@ -112,3 +112,17 @@ def stream_audio(request, filename):
     response = FileResponse(open(path, "rb"), content_type=content_type)
     response["Accept-Ranges"] = "bytes"
     return response
+
+
+def create_users(request):
+    if(request.method == "POST"):
+        user_id = request.POST.get("userId")
+        password = request.POST.get("password")
+        uploaded_file = request.FILES.get("file")
+
+        print(user_id)
+        print(password)
+        print(uploaded_file)
+        print(uploaded_file.name)
+        print(uploaded_file.size)
+    return
