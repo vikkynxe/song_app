@@ -8,7 +8,12 @@ import yt_dlp
 import re
 from . import recommendation, sha_256_hashing
 import numpy as np
+from django.views.decorators.csrf import ensure_csrf_cookie
 
+
+@ensure_csrf_cookie
+def csrf(request):
+    return JsonResponse({"message": "CSRF cookie set"})
 
 DOWNLOAD_FOLDER = "downloads"
 
@@ -115,7 +120,7 @@ def stream_audio(request, filename):
 
 
 def create_users(request):
-    if(request.method == "POST"):
+    if request.method == "POST":
         user_id = request.POST.get("userId")
         password = request.POST.get("password")
         uploaded_file = request.FILES.get("file")
@@ -125,4 +130,9 @@ def create_users(request):
         print(uploaded_file)
         print(uploaded_file.name)
         print(uploaded_file.size)
-    return
+
+        return JsonResponse({
+            "message": "File received successfully"
+        })
+
+    return JsonResponse({"error": "Only POST allowed"}, status=405)

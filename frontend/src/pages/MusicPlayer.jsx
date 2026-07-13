@@ -10,7 +10,7 @@ export default function MusicPlayer() {
   // Fetch songs from API
   const fetchSongs = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/songs/");
+      const response = await fetch("http://localhost:8000/api/songs/");
       const data = await response.json();
 
       // Assuming the API returns an array of songs

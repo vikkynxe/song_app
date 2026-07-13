@@ -18,10 +18,37 @@ function CreateAccount() {
     formData.append("userId", userId);
     formData.append("password", password);
     formData.append("file", file);
+
+    await fetch("http://localhost:8000/api/csrf/", {
+      credentials: "include",
+    });
+    console.log(document.cookie);
+
+    function getCookie(name) {
+      const cookies = document.cookie.split(";");
+    
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+    
+        if (cookie.startsWith(name + "=")) {
+          console.log( decodeURIComponent(cookie.substring(name.length + 1)));
+          return decodeURIComponent(cookie.substring(name.length + 1));
+        }
+      }
+    
+      return null;
+    }
+
+    const csrfToken = getCookie("csrftoken");
+
   
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/create_users", {
+      const response = await fetch("http://localhost:8000/api/create_users", {
         method: "POST",
+        credentials: "include",
+        headers: {
+          "X-CSRFToken": csrfToken,
+        },
         body: formData,
       });
   
