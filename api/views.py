@@ -9,6 +9,7 @@ import re
 from . import recommendation, sha_256_hashing
 import numpy as np
 from django.views.decorators.csrf import ensure_csrf_cookie
+import psycopg
 
 
 @ensure_csrf_cookie
