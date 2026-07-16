@@ -80,8 +80,12 @@ WSGI_APPLICATION = 'Song_downloading_application.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'song_app',
+        'USER': 'it_me_owner',
+        'PASSWORD': 'error^3',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 

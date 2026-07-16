@@ -9,7 +9,7 @@ import re
 from . import recommendation, sha_256_hashing
 import numpy as np
 from django.views.decorators.csrf import ensure_csrf_cookie
-import psycopg
+from django.db import connection
 
 
 @ensure_csrf_cookie
@@ -131,6 +131,9 @@ def create_users(request):
         print(uploaded_file)
         print(uploaded_file.name)
         print(uploaded_file.size)
+
+        if(uploaded_file.size > (50 * 1024 * 1024)):
+            print("Not Okay")
 
         return JsonResponse({
             "message": "File received successfully"
