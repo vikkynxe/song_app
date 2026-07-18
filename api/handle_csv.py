@@ -4,13 +4,29 @@ import io
 from django.shortcuts import render
 from .models import Track
 from  sha_256_hashing import hashing_sha_256
+from psycopg2.extras import execute_values
+import pandas as pd
+import psycopg2
+
+
+def __ini
+    required_fields = ["id", "name", "email"]
+
+    conn = psycopg2.connect(
+        host="localhost",
+        database="mydb",
+        user="postgres",
+        password="password"
+    )
 
 
 def csv_handler(file_csv):
 
 
     uploaded_file = request.FILES.get("file")
-
+    
+    
+    
     text_file = io.TextIOWrapper(
         uploaded_file.file,
         encoding="utf-8"
