@@ -11,7 +11,8 @@ import numpy as np
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db import connection
 from pathlib import Path
-
+from .handle_csv import CSV_handler_class
+import io
 
 
 @ensure_csrf_cookie
@@ -128,52 +129,27 @@ def create_users(request):
         password = request.POST.get("password")
         uploaded_csv = request.FILES.get("file")
 
-        if csv_file is None:
-            return Response({"error": "No file uploaded"}, status=400)
+        if uploaded_csv is None:
+            return JsonResponse({"error": "No file uploaded"}, status=400)
 
-        if(uploaded_csv.size > (50 * 1024 * 1024)):
+        if(uploaded_csv.size > (30 * 1024 * 1024)):
             print("Not Okay")
-            return Response({"error": "File too large"}, status=400)
+            return JsonResponse({"error": "File too large"}, status=400)
         
         if Path(uploaded_csv.name).suffix.lower() != ".csv":
-            return Response({"error": "Only CSV files allowed"}, status=400)
-        
-
-
-        print(user_id)
-        print(password)
-        print(uploaded_csv)
-        print(uploaded_csv.name)
-        print(uploaded_csv.size)
+            return JsonResponse({"error": "Only CSV files allowed"}, status=400)
 
         try:
             text = io.TextIOWrapper(uploaded_csv.file, encoding="utf-8")
-            reader = csv.reader(text)
-
-            header = next(reader)
-
         except UnicodeDecodeError:
-            return Response({"error": "File must be UTF-8"}, status=400)
-
+            print("UnicodeDecodeError")
+            return JsonResponse({"error": "File must be UTF-8"}, status=400)
         except Exception:
-            return Response({"error": "Invalid CSV"}, status=400)
+            print("Exception")
+            return JsonResponse({"error": "Invalid CSV"}, status=400)
 
-        
-        common_fields = [  "track_hash",  "track_name",  "album_name",  "artist_names",
-            "release_date",  "duration_ms",  "popularity",  "explicit",  "added_by",
-            "added_at",  "genres",  "record_label",  "danceability",  "energy",
-            "track_key",  "loudness",  "mode",  "speechiness",  "acousticness",
-            "instrumentalness",  "liveness",  "valence",  "tempo",  "time_signature" ]
-
-        missing = required - set(header)
-
-        if missing:
-            return Response(
-                {"error": f"Missing columns: {missing}"},
-                status=400,
-            )
-
-
+        handle_csv_class = CSV_handler_class(text, user_id, password)
+        handle_csv_class.csv_handler()
 
         return JsonResponse({
             "message": "File received successfully"

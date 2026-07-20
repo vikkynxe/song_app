@@ -4,9 +4,7 @@ import base64
 text = "Kutti StoryMaster (Original Motion Picture Soundtrack)Anirudh Ravichander;Vijay;Arunraja Kamaraj"
 
 def hashing_sha_256(data):
-
     hash_id = hashlib.sha256(data.encode("utf-8")).hexdigest()
-    
     return (hash_id)
 
 
