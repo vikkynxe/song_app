@@ -1,47 +1,50 @@
 import { useState } from "react";
 
 function CreateAccount() {
-  const [userId, setUserId] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [dob, setDob] = useState("");
+  const [aboutYou, setAboutYou] = useState("");
   const [file, setFile] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (password !== confirmPassword) {
       alert("Passwords do not match");
       return;
     }
-  
+
     const formData = new FormData();
-    formData.append("userId", userId);
+    formData.append("username", username);
+    formData.append("email", email);
     formData.append("password", password);
+    formData.append("dob", dob);
+    formData.append("about_you", aboutYou);
     formData.append("file", file);
 
     await fetch("http://localhost:8000/api/csrf/", {
       credentials: "include",
     });
-    console.log(document.cookie);
 
     function getCookie(name) {
       const cookies = document.cookie.split(";");
-    
+
       for (let cookie of cookies) {
         cookie = cookie.trim();
-    
+
         if (cookie.startsWith(name + "=")) {
-          console.log( decodeURIComponent(cookie.substring(name.length + 1)));
           return decodeURIComponent(cookie.substring(name.length + 1));
         }
       }
-    
+
       return null;
     }
 
     const csrfToken = getCookie("csrftoken");
 
-  
     try {
       const response = await fetch("http://localhost:8000/api/create_users", {
         method: "POST",
@@ -51,11 +54,16 @@ function CreateAccount() {
         },
         body: formData,
       });
-  
+
       const data = await response.json();
-  
+
       console.log(data);
-      alert("Account Created Successfully!");
+
+      if (response.ok) {
+        alert("Account Created Successfully!");
+      } else {
+        alert(data.message || "Failed to create account");
+      }
     } catch (error) {
       console.error(error);
       alert("Something went wrong");
@@ -69,12 +77,23 @@ function CreateAccount() {
 
         <form onSubmit={handleSubmit}>
           <div className="input-group">
-            <label>User ID</label>
+            <label>Username</label>
             <input
               type="text"
-              placeholder="Enter User ID"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
+              placeholder="Enter Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="input-group">
+            <label>Email</label>
+            <input
+              type="email"
+              placeholder="Enter Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
@@ -101,6 +120,27 @@ function CreateAccount() {
             />
           </div>
 
+          <div className="input-group">
+            <label>Date of Birth</label>
+            <input
+              type="date"
+              value={dob}
+              onChange={(e) => setDob(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="input-group">
+            <label>About You</label>
+            <textarea
+              placeholder="Tell us about yourself"
+              value={aboutYou}
+              onChange={(e) => setAboutYou(e.target.value)}
+              rows={4}
+              required
+            />
+          </div>
+          
           <div className="input-group">
             <label>Upload File</label>
             <input

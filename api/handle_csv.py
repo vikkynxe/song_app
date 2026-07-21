@@ -12,7 +12,7 @@ from psycopg2.errors import UniqueViolation
 
 
 class CSV_handler_class():
-    def __init__(self, text_from_view, user_id, password):
+    def __init__(self, text_from_view, username, email, password, dob, about_you):
         self.required = [
             "Track Name",
             "Album Name",
@@ -47,23 +47,52 @@ class CSV_handler_class():
             password="error^3"
         )
 
-        self.user_id = user_id
+        self.username = username
+        self.email = email
         self.password = password
+        self.dob = dob
+        self.about_you = about_you
+
         self.cursor = self.conn.cursor()
 
     def create_user_acc(self):
-        query = """INSERT INTO users_table (
-            "hash_id",
-            "username",
-            "email",
-            "password",
-            "dob",
-            "about_you",
-            "is_active",
-            "created_at",
-            "updated_at"
-        )"""
+        query = """
+            INSERT INTO users_table (
+                hash_id,
+                username,
+                email,
+                password,
+                dob,
+                about_you
+            )
+            VALUES (%s, %s, %s, %s, %s, %s);
+            """
+        combined_string = "".join([self.username, self.email, self.password, str(self.dob)])
+        hash_id = hashlib.sha256(combined_string.encode("utf-8")).hexdigest()
+
+
+        try:
+            self.cursor.execute(
+                query,
+                (
+                    hash_id,
+                    self.username,
+                    self.email,
+                    self.password,
+                    self.dob,
+                    self.about_you,
+                ),
+            )
+        except UniqueViolation:
+            print("maan you have already accunt")
+            return JsonResponse({
+                "status": 400,
+                "error": "account already exist"
+            })
         
+
+        return True
+
 
     def csv_handler(self):
         
@@ -221,8 +250,13 @@ class CSV_handler_class():
                 self.conn.commit()
 
         print("fine")
+
+        is_acc_done = self.create_user_acc()
         
-        return JsonResponse({
-            "status": "success",
-            "message": "CSV uploaded successfully"
-        })
+        if is_acc_done:
+
+            return JsonResponse({
+                "status": "success",
+                "message": "CSV uploaded successfully, and account also"
+            })
+        

@@ -125,10 +125,15 @@ def stream_audio(request, filename):
 
 def create_users(request):
     if request.method == "POST":
-        user_id = request.POST.get("userId")
+        username = request.POST.get("username")
+        email = request.POST.get("email")
         password = request.POST.get("password")
+        dob = request.POST.get("dob")
+        about_you = request.POST.get("about_you")
         uploaded_csv = request.FILES.get("file")
 
+        if not all([username, email, password, dob, about_you]):
+            print("Fields are empty")
         if uploaded_csv is None:
             return JsonResponse({"error": "No file uploaded"}, status=400)
 
@@ -148,7 +153,7 @@ def create_users(request):
             print("Exception")
             return JsonResponse({"error": "Invalid CSV"}, status=400)
 
-        handle_csv_class = CSV_handler_class(text, user_id, password)
+        handle_csv_class = CSV_handler_class(text, username, email, password, dob, about_you)
         handle_csv_class.csv_handler()
 
         return JsonResponse({
@@ -156,3 +161,7 @@ def create_users(request):
         })
 
     return JsonResponse({"error": "Only POST allowed"}, status=405)
+
+
+def function_for_sign_in():
+    print("hai")
