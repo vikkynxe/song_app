@@ -6,5 +6,6 @@ urlpatterns = [
     path("download/", download_song),
     path("songs/", get_song),
     path("audio/<str:filename>", stream_audio),
-    path("create_users", create_users),
+    path("create_users/", create_users),
+    #path("")
 ]
