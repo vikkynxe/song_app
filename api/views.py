@@ -163,5 +163,6 @@ def create_users(request):
     return JsonResponse({"error": "Only POST allowed"}, status=405)
 
 
-def function_for_sign_in():
-    print("hai")
+def function_for_sign_in(request):
+    if request.method == "POST":
+        print("hai")

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import download_song, get_song, stream_audio, recommendation, create_users, csrf
+from .views import download_song, get_song, stream_audio, recommendation, create_users, csrf, function_for_sign_in
 
 urlpatterns = [
     path("csrf/", csrf),
@@ -7,5 +7,5 @@ urlpatterns = [
     path("songs/", get_song),
     path("audio/<str:filename>", stream_audio),
     path("create_users/", create_users),
-    #path("")
+    path("sign_in/",function_for_sign_in),
 ]
