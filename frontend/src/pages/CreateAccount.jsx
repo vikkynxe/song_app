@@ -46,7 +46,7 @@ function CreateAccount() {
     const csrfToken = getCookie("csrftoken");
 
     try {
-      const response = await fetch("http://localhost:8000/api/create_users", {
+      const response = await fetch("http://localhost:8000/api/create_users/", {
         method: "POST",
         credentials: "include",
         headers: {

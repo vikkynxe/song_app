@@ -18,7 +18,7 @@ function App() {
         <Route
           path="/MusicPlayer"
           element={
-            isLoggedIn === ("true" || '' || null) ? <MusicPlayer /> : <Navigate to="/" />
+            isLoggedIn === ("true") ? <MusicPlayer /> : <Navigate to="/" />
           }
         />
       </Routes>

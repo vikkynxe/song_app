@@ -2,16 +2,48 @@ import React, { useState } from "react";
 import "./log_in.css";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
+  const [user_name, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Email:", email);
-    console.log("Password:", password);
-    localStorage.setItem("isLoggedIn", "true");
-    alert("Login Successful!");
-  };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await fetch("http://localhost:8000/api/sign_in/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user_name,
+        password,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      console.log("Success:", data);
+
+      localStorage.setItem("isLoggedIn", "true");
+      
+
+      // If your backend returns a token
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+
+      alert("Login Successful!");
+      
+      window.location.href = "/MusicPlayer";
+    } else {
+      alert(data.message || "Login failed");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Unable to connect to the server.");
+  }
+};
 
   return (
     <div className="login-container">
@@ -19,12 +51,12 @@ const Login = () => {
         <h2>Login</h2>
 
         <div className="input-group">
-          <label>Email</label>
+          <label>User Name</label>
           <input
-            type="email"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            placeholder="Enter your User name"
+            value={user_name}
+            onChange={(e) => setUsername(e.target.value)}
             required
           />
         </div>

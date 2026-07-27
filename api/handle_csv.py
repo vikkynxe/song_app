@@ -67,7 +67,7 @@ class CSV_handler_class():
             )
             VALUES (%s, %s, %s, %s, %s, %s);
             """
-        combined_string = "".join([self.username, self.email, self.password, str(self.dob)])
+        combined_string = "".join([self.username, self.password])
         hash_id = hashlib.sha256(combined_string.encode("utf-8")).hexdigest()
 
 
@@ -83,6 +83,14 @@ class CSV_handler_class():
                     self.about_you,
                 ),
             )
+            self.conn.commit()
+            print(hash_id,
+                    self.username,
+                    self.email,
+                    self.password,
+                    self.dob,
+                    self.about_you)
+
         except UniqueViolation:
             print("maan you have already accunt")
             return JsonResponse({

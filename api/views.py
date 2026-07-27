@@ -13,6 +13,13 @@ from django.db import connection
 from pathlib import Path
 from .handle_csv import CSV_handler_class
 import io
+from django.views.decorators.csrf import csrf_exempt
+import json
+import hashlib
+import psycopg2 
+from psycopg2.extras import execute_values
+from psycopg2.errors import UniqueViolation
+
 
 
 @ensure_csrf_cookie
@@ -162,7 +169,56 @@ def create_users(request):
 
     return JsonResponse({"error": "Only POST allowed"}, status=405)
 
-
+@csrf_exempt
 def function_for_sign_in(request):
     if request.method == "POST":
-        print("hai")
+        try:
+            data = json.loads(request.body)
+
+            user_name = data.get("user_name")
+            password = data.get("password")
+
+            print("user_name:", user_name)
+            print("Password:", password)
+
+            combined_string = "".join([user_name, password])
+            hash_id = hashlib.sha256(combined_string.encode("utf-8")).hexdigest()
+
+            print(hash_id)
+
+            conn = psycopg2.connect(
+                host="localhost",
+                database="song_app",
+                user="it_me_owner",
+                password="error^3"
+                )
+
+            cursor = conn.cursor()
+
+            cursor.execute(
+                "SELECT * FROM users_table WHERE hash_id = %s",
+                [hash_id]
+            )
+
+            row = cursor.fetchone()
+
+            if row is None:
+                return JsonResponse({
+                    "message": "No Account Found"
+                }, status=400)
+            else:
+                print("Data found:", row)
+
+            return JsonResponse({
+                "message": "Login data received",
+                "token": hash_id
+            }, status=200)
+
+        except json.JSONDecodeError:
+            return JsonResponse({
+                "message": "Invalid JSON"
+            }, status=400)
+
+    return JsonResponse({
+        "message": "Only POST method is allowed"
+    }, status=405)
