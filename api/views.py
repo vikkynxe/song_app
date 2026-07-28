@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import yt_dlp
 import re
-from . import recommendation, sha_256_hashing, handle_csv
+from . import recommendation, handle_csv
 import numpy as np
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db import connection
@@ -86,6 +86,7 @@ def get_song(request):
         }
         for item in raw
     ]
+    print(cleaned)
     return JsonResponse({"songs": cleaned})
 
 def stream_audio(request, filename):
@@ -222,3 +223,7 @@ def function_for_sign_in(request):
     return JsonResponse({
         "message": "Only POST method is allowed"
     }, status=405)
+
+
+def get_song_from_playlist():
+    print("ok ")

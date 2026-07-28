@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import "./musicplayer.css";
 
 export default function MusicPlayer() {
   const [songs, setSongs] = useState([]);
@@ -71,17 +72,21 @@ export default function MusicPlayer() {
   }
 
   return (
-    <div>
-      <h2>{songs.songs[currentSong].title}</h2>
-      <p>{songs.songs[currentSong].artist}</p>
+    <div className="player">
+      <div className="song-info">
+        <h2>{songs.songs[currentSong].title}</h2>
+        <p>{songs.songs[currentSong].artist}</p>
+      </div>
 
-      <button onClick={previousSong}>Previous</button>
+      <div className="controls">
+        <button onClick={previousSong}>⏮</button>
 
-      <button onClick={togglePlay}>
-        {isPlaying ? "Pause" : "Play"}
-      </button>
+        <button className="play-btn" onClick={togglePlay}>
+          {isPlaying ? "⏸ Pause" : "▶ Play"}
+        </button>
 
-      <button onClick={nextSong}>Next</button>
+        <button onClick={nextSong}>⏭</button>
+      </div>
 
       <audio
         ref={audioRef}
