@@ -9,4 +9,5 @@ urlpatterns = [
     path("create_users/", create_users),
     path("sign_in/",function_for_sign_in),
     path("get_song_from_playlist/", get_song_from_playlist),
+    path("hash_getter/", hash_getter)
 ]

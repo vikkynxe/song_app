@@ -71,21 +71,20 @@ export default function MusicPlayer() {
     return <h3>Loading songs...</h3>;
   }
 
-  return (
-    <div className="player">
-      <div className="song-info">
-        <h2>{songs.songs[currentSong].title}</h2>
-        <p>{songs.songs[currentSong].artist}</p>
-      </div>
+return (
+  <div className="music-player">
+    <div className="player-card">
+      <h2>{songs.songs[currentSong].title}</h2>
+      <p>{songs.songs[currentSong].artist}</p>
 
       <div className="controls">
-        <button onClick={previousSong}>⏮</button>
+        <button onClick={previousSong}>Previous</button>
 
         <button className="play-btn" onClick={togglePlay}>
-          {isPlaying ? "⏸ Pause" : "▶ Play"}
+          {isPlaying ? "Pause" : "Play"}
         </button>
 
-        <button onClick={nextSong}>⏭</button>
+        <button onClick={nextSong}>Next</button>
       </div>
 
       <audio
@@ -94,5 +93,6 @@ export default function MusicPlayer() {
         onEnded={nextSong}
       />
     </div>
-  );
+  </div>
+);
 }

@@ -1,161 +1,115 @@
 /* musicplayer.css */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
 
-/* --- RESET & GLOBALS --- */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-:root {
-  --bg: #121212;
-  --card: #1e1e2f;
-  --primary: #1db954;
-  --primary-hover: #1ed760;
-  --text: #ffffff;
-  --subtext: #b3b3b3;
-}
-
-body {
+.music-player {
   min-height: 100vh;
-  font-family: 'Montserrat', sans-serif;
-  background: linear-gradient(135deg, #141414, #1c1c2c);
-}
-
-#root {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  background: linear-gradient(135deg, #1f1c2c, #928dab);
   padding: 20px;
 }
 
-/* --- PLAYER CONTAINER --- */
-.player {
-  width: min(380px, 95vw);
-  padding: 30px;
-  background: #202030;
-  border-radius: 24px;
-  box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  color: var(--text);
+
+/* Player card */
+.player-card {
+  width: 380px;
+  padding: 35px;
   text-align: center;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(15px);
+  border-radius: 25px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.35);
+  color: white;
 }
 
-/* --- ALBUM ART (PSEUDO-ELEMENT) --- */
-.song-info::before {
-  content: "";
-  display: block;
-  width: 250px;
-  aspect-ratio: 1;
-  margin: 0 auto 25px auto; /* Strictly center */
-  border-radius: 20px;
-  background: 
-    radial-gradient(circle at 25% 25%, #7b2ff7, transparent 45%),
-    radial-gradient(circle at 80% 80%, #00c6ff, transparent 40%),
-    radial-gradient(circle at 70% 20%, #ffb347, transparent 30%),
-    linear-gradient(135deg, #1b1b2f, #111827);
-  box-shadow: 
-    0 10px 30px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+/* Song title */
+.player-card h2 {
+  margin: 0 0 12px;
+  font-size: 28px;
+  font-weight: 700;
+  text-transform: capitalize;
 }
 
-/* --- TYPOGRAPHY --- */
-.song-info h2 {
-  margin-bottom: 8px;
-  font-size: 24px;
-  font-weight: 800;
-  word-break: break-word;
+
+/* Artist */
+.player-card p {
+  margin: 0 0 30px;
+  font-size: 18px;
+  color: #ddd;
 }
 
-.song-info p {
-  margin-bottom: 30px;
-  color: var(--subtext);
-  font-size: 14px;
-  letter-spacing: 1px;
-}
 
-/* --- CONTROLS --- */
+/* Button container */
 .controls {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 16px;
+  gap: 15px;
 }
 
-/* Added Flexbox to button to perfectly center inner icons/text */
+
+/* Buttons */
 .controls button {
-  display: flex; 
-  justify-content: center;
-  align-items: center;
+  padding: 12px 18px;
   border: none;
-  outline: none;
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text);
+  border-radius: 50px;
   cursor: pointer;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
-  transition: all 0.25s ease;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  background: white;
+  color: #1f1c2c;
+
+  transition: 0.3s ease;
 }
 
-.controls button:not(.play-btn) {
-  width: 55px;
-  height: 55px;
-  border-radius: 50%;
-  font-size: 22px;
-}
 
-.play-btn {
-  height: 55px;
-  padding: 0 30px;
-  border-radius: 30px;
-  background: var(--primary) !important;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-/* --- INTERACTIONS --- */
 .controls button:hover {
-  transform: translateY(-3px) scale(1.05);
+  transform: translateY(-3px);
+  background: #ff4b5c;
+  color: white;
 }
 
-.play-btn:hover {
-  background: var(--primary-hover) !important;
+
+/* Play button */
+.play-btn {
+  padding: 14px 28px !important;
+  background: #ff4b5c !important;
+  color: white !important;
 }
 
-.controls button:active {
-  transform: scale(0.95);
-}
 
-/* --- NATIVE AUDIO --- */
-audio {
+/* Audio */
+.player-card audio {
   width: 100%;
-  margin-top: 25px;
-  border-radius: 10px;
-  filter: invert(0.95) hue-rotate(180deg);
+  margin-top: 30px;
 }
 
-/* --- MEDIA QUERIES --- */
-@media (max-width: 480px) {
-  .player {
-    padding: 20px;
+
+/* Loading */
+.music-player h3 {
+  color: white;
+  font-size: 25px;
+}
+
+
+/* Mobile */
+@media(max-width:500px){
+
+  .player-card {
+    width: 95%;
+    padding: 25px;
   }
-  
-  .song-info::before {
-    width: 200px;
-  }
-  
-  .song-info h2 {
-    font-size: 20px;
-  }
-  
+
   .controls {
-    gap: 12px;
+    gap: 8px;
   }
-  
-  .play-btn {
-    padding: 0 20px;
+
+  .controls button {
+    padding: 10px 12px;
+    font-size: 12px;
   }
+
 }

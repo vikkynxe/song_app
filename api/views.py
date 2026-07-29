@@ -161,7 +161,7 @@ def create_users(request):
             print("Exception")
             return JsonResponse({"error": "Invalid CSV"}, status=400)
 
-        handle_csv_class = CSV_handler_class(text, username, email, password, dob, about_you)
+        handle_csv_class = CSV_handler_class(text, username, email, password, dob, about_you, "liked_playlist")
         handle_csv_class.csv_handler()
 
         return JsonResponse({
@@ -227,3 +227,54 @@ def function_for_sign_in(request):
 
 def get_song_from_playlist():
     print("ok ")
+
+def hash_getter(request):
+    if request.method == "POST":
+        try:
+            text1 = request.POST.get("text1")
+            text2 = request.POST.get("text2")
+            combined_string = "".join([text1, text2])
+            user_hash = hashlib.sha256(combined_string.encode("utf-8")).hexdigest()
+            return user_hash
+        except:
+            print("nothing new ,...")
+        
+def create_playlist(request):
+    if request.method == "POST":
+        hash_id = request.POST.get("hash_id")
+        playlist_name = request.POST.get("playlistname")
+        uploaded_csv = request.FILES.get("file")
+
+        if uploaded_csv is None:
+            return JsonResponse({"error": "No file uploaded"}, status=400)
+
+        if(uploaded_csv.size > (30 * 1024 * 1024)):
+            print("Not Okay")
+            return JsonResponse({"error": "File too large"}, status=400)
+        
+        if Path(uploaded_csv.name).suffix.lower() != ".csv":
+            return JsonResponse({"error": "Only CSV files allowed"}, status=400)
+
+        try:
+            text = io.TextIOWrapper(uploaded_csv.file, encoding="utf-8")
+        except UnicodeDecodeError:
+            print("UnicodeDecodeError")
+            return JsonResponse({"error": "File must be UTF-8"}, status=400)
+        except Exception:
+            print("Exception")
+            return JsonResponse({"error": "Invalid CSV"}, status=400)
+
+        username = ''
+        email = ''
+        password = ''
+        dob = ''
+        about_you = ''
+
+        handle_csv_class = CSV_handler_class(text, username, email, password, dob, about_you, playlist_name, hash_id)
+        handle_csv_class.csv_handler()
+
+        return JsonResponse({
+            "message": "File received successfully"
+        })
+
+    return JsonResponse({"error": "Only POST allowed"}, status=405)

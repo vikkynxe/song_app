@@ -12,7 +12,7 @@ from psycopg2.errors import UniqueViolation
 
 
 class CSV_handler_class():
-    def __init__(self, text_from_view, username, email, password, dob, about_you):
+    def __init__(self, text_from_view, username, email, password, dob, about_you, playlist_name, hash_id):
         self.required = [
             "Track Name",
             "Album Name",
@@ -52,6 +52,8 @@ class CSV_handler_class():
         self.password = password
         self.dob = dob
         self.about_you = about_you
+        self.playlist_name = playlist_name
+        self.hash_id = hash_id
 
         self.cursor = self.conn.cursor()
 
@@ -97,8 +99,7 @@ class CSV_handler_class():
                 "status": 400,
                 "error": "account already exist"
             })
-        
-
+    
         return True
 
 
@@ -117,8 +118,6 @@ class CSV_handler_class():
             )
 
         data = []
-        batch_size = 1000
-
         query = """INSERT INTO user_song_list (
             track_hash,
             track_name,
@@ -196,7 +195,7 @@ class CSV_handler_class():
             try:
                 execute_values(self.cursor, query, data)
                 self.conn.commit()
-                data = []
+                data=[]
             except UniqueViolation:
                 update_query = """
                     UPDATE user_song_list
@@ -255,10 +254,13 @@ class CSV_handler_class():
                 ]
                 self.conn.rollback()
                 self.cursor.execute(update_query, update_value)
-                self.conn.commit()
+                
+                data=[]
+            
+        self.conn.commit()
 
-        print("fine")
-
+        self.playlist_creater()
+        
         is_acc_done = self.create_user_acc()
         
         if is_acc_done:
@@ -268,3 +270,23 @@ class CSV_handler_class():
                 "message": "CSV uploaded successfully, and account also"
             })
         
+    
+    def playlist_creater(self):
+        if(self.username == '' or self.password == ''):
+            combined_text = "".join[self.hash_id, self.playlist_name]
+            user_hash = self.hash_id
+        else:
+            combined_text = "".join[self.username,self.password,self.playlist_name]
+            combined_string = "".join([self.username, self.password])
+            user_hash = hashlib.sha256(combined_string.encode("utf-8")).hexdigest()
+
+        playlist_query = "INSERT INTO user_playlists (id_hash, user_hash, playlist_name) VALUES (%s, %s, %s)"
+        
+        hash_value = hashlib.sha256(
+            combined_text.encode("utf-8")
+        ).hexdigest()
+
+        value_playlist = [hash_value, user_hash, self.playlist_name]
+        
+        self.cursor.execute(playlist_query, value_playlist)
+        self.conn.commit()
