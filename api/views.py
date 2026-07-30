@@ -6,12 +6,13 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import yt_dlp
 import re
-from . import recommendation, handle_csv
+from . import recommendation
 import numpy as np
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db import connection
 from pathlib import Path
 from .handle_csv import CSV_handler_class
+from .handle_user_req import handle_user_request
 import io
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -161,7 +162,7 @@ def create_users(request):
             print("Exception")
             return JsonResponse({"error": "Invalid CSV"}, status=400)
 
-        handle_csv_class = CSV_handler_class(text, username, email, password, dob, about_you, "liked_playlist")
+        handle_csv_class = CSV_handler_class(text, username, email, password, dob, about_you, "liked_playlist", '')
         handle_csv_class.csv_handler()
 
         return JsonResponse({
@@ -225,8 +226,22 @@ def function_for_sign_in(request):
     }, status=405)
 
 
-def get_song_from_playlist():
-    print("ok ")
+def get_data_for_user(request):
+    if request.method == "POST":
+        try:
+            hash_data = request.POST.get("hash_data")
+            type_of_hash = request.POST.get("type_of_hash")
+
+            if type_of_hash == "playlist":
+                playlist_data = handle_user_request()
+                playlist_data.get_user_playlist(hash_data)
+            if type_of_hash == "song":
+                song_data = handle_user_request()
+                song_data.get_song_data(hash_data)
+
+            print(user_hash)
+        except:
+            print("data is importent biguluu")
 
 def hash_getter(request):
     if request.method == "POST":
@@ -238,6 +253,7 @@ def hash_getter(request):
             return user_hash
         except:
             print("nothing new ,...")
+            return 0
         
 def create_playlist(request):
     if request.method == "POST":
@@ -271,7 +287,9 @@ def create_playlist(request):
         about_you = ''
 
         handle_csv_class = CSV_handler_class(text, username, email, password, dob, about_you, playlist_name, hash_id)
-        handle_csv_class.csv_handler()
+        data = handle_csv_class.csv_handler()
+
+        print(data)
 
         return JsonResponse({
             "message": "File received successfully"

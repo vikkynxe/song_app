@@ -150,7 +150,10 @@ class CSV_handler_class():
             release_data = f"{int(row[header.index('Release Date')])}-01-01"
         except:
             release_data = f'{1800}-01-01'
+
         
+        playlist_hash = self.playlist_creater()
+
         for row in reader:
             combined = "".join([
                 row[header.index("Track Name")],
@@ -165,6 +168,8 @@ class CSV_handler_class():
             hash_value = hashlib.sha256(
                 combined.encode("utf-8")
             ).hexdigest()
+            query_for_link = f"INSERT INTO playlist_tracks (playlist_id, song_id) VALUES ('{playlist_hash}', '{hash_value}')"
+            self.cursor.execute(query_for_link)
 
             data.append((
                 hash_value,
@@ -194,7 +199,6 @@ class CSV_handler_class():
             ))
             try:
                 execute_values(self.cursor, query, data)
-                self.conn.commit()
                 data=[]
             except UniqueViolation:
                 update_query = """
@@ -254,13 +258,11 @@ class CSV_handler_class():
                 ]
                 self.conn.rollback()
                 self.cursor.execute(update_query, update_value)
-                
                 data=[]
             
         self.conn.commit()
 
-        self.playlist_creater()
-        
+
         is_acc_done = self.create_user_acc()
         
         if is_acc_done:
@@ -273,10 +275,10 @@ class CSV_handler_class():
     
     def playlist_creater(self):
         if(self.username == '' or self.password == ''):
-            combined_text = "".join[self.hash_id, self.playlist_name]
+            combined_text = "".join([self.hash_id, self.playlist_name])
             user_hash = self.hash_id
         else:
-            combined_text = "".join[self.username,self.password,self.playlist_name]
+            combined_text = "".join([self.username,self.password,self.playlist_name])
             combined_string = "".join([self.username, self.password])
             user_hash = hashlib.sha256(combined_string.encode("utf-8")).hexdigest()
 
@@ -290,3 +292,6 @@ class CSV_handler_class():
         
         self.cursor.execute(playlist_query, value_playlist)
         self.conn.commit()
+
+        return hash_value
+    
