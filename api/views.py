@@ -188,21 +188,8 @@ def function_for_sign_in(request):
 
             print(hash_id)
 
-            conn = psycopg2.connect(
-                host="localhost",
-                database="song_app",
-                user="it_me_owner",
-                password="error^3"
-                )
-
-            cursor = conn.cursor()
-
-            cursor.execute(
-                "SELECT * FROM users_table WHERE hash_id = %s",
-                [hash_id]
-            )
-
-            row = cursor.fetchone()
+            sign_in_func = handle_user_request()
+            row = sign_in_func.sign_in_function(hash_id)
 
             if row is None:
                 return JsonResponse({
@@ -234,12 +221,13 @@ def get_data_for_user(request):
 
             if type_of_hash == "playlist":
                 playlist_data = handle_user_request()
-                playlist_data.get_user_playlist(hash_data)
+                resulted_data = playlist_data.get_user_playlist(hash_data)
             if type_of_hash == "song":
                 song_data = handle_user_request()
-                song_data.get_song_data(hash_data)
+                resulted_data = song_data.get_song_data(hash_data)
 
-            print(user_hash)
+            print("UserId",user_hash)
+            print("Data",resulted_data)
         except:
             print("data is importent biguluu")
 

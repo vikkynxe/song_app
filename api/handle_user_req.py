@@ -30,3 +30,15 @@ class handle_user_request():
     
     def get_song_data(self, id_playlist):
         print(id_playlist)
+    
+    def sign_in_function(self, hash_id_for_signin):
+        self.cursor.execute(
+            "SELECT * FROM users_table WHERE hash_id = %s",
+            [hash_id_for_signin]
+        )
+        row = self.cursor.fetchone()
+
+        if row == None:
+            print("nothing is here need to create")
+        
+        return row
