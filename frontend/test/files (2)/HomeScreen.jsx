@@ -1,23 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Play, Bell } from 'lucide-react';
-import { recentlyPlayed, continueListening, user } from './mockData';
 
-export default function HomeScreen({
-  theme,
-  cover,
-  playSong,
-  currentSong,
-}) {
-  const [recommended, setRecommended] = useState([]);
-  const [ua, ub] = cover(user.avatarIdx);
+function greeting() {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 18) return 'Good afternoon';
+  return 'Good evening';
+}
 
+// NOTE: the backend has no "recently played" / "recommended" /
+// "continue listening" concepts yet — it returns one flat list of
+// (currently 5, hardcoded) recommended songs. We reuse that same
+// list across sections so the layout still has content, rather
+// than inventing fake distinctions the API doesn't back.
+export default function HomeScreen({ theme, cover, playSong, currentSong, songs, user }) {
+  const [ua, ub] = cover(0);
+  const displayName = user?.name || 'there';
 
   return (
     <div style={{ padding: '36px 48px 60px', maxWidth: 1180, margin: '0 auto', animation: 'fadeUp 0.35s ease' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 36 }}>
         <div>
-          <div style={{ fontSize: 14, color: theme.color.textSecondary, fontWeight: 500 }}></div>
-          <div style={{ fontFamily: theme.font.display, fontSize: 30, fontWeight: 700, marginTop: 2, letterSpacing: -0.5 }}>{user.name.split(' ')[0]}</div>
+          <div style={{ fontSize: 14, color: theme.color.textSecondary, fontWeight: 500 }}>{greeting()}</div>
+          <div style={{ fontFamily: theme.font.display, fontSize: 30, fontWeight: 700, marginTop: 2, letterSpacing: -0.5 }}>{displayName.split(' ')[0]}</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <button style={{ width: 40, height: 40, borderRadius: '50%', border: `1px solid ${theme.color.border}`, background: theme.color.surface, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -27,29 +32,27 @@ export default function HomeScreen({
         </div>
       </div>
 
-      <Section title="Continue Listening" theme={theme}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
-          {continueListening.map((s) => (
-            <ContinueRow key={s.id} song={s} theme={theme} cover={cover} onPress={() => playSong(s)} active={currentSong?.id === s.id} />
-          ))}
-        </div>
-      </Section>
-
-      <Section title="Recently Played" theme={theme}>
+      <Section title="Recommended for you" theme={theme}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 20 }}>
-          {recentlyPlayed.map((s) => (
+          {songs.map((s) => (
             <SquareCard key={s.id} song={s} theme={theme} cover={cover} onPress={() => playSong(s)} active={currentSong?.id === s.id} />
           ))}
         </div>
       </Section>
 
-      <Section title="Recommended for you" theme={theme} last>
+      <Section title="All songs" theme={theme} last>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '4px 24px' }}>
-          {recommended.map((s) => (
+          {songs.map((s) => (
             <ListRow key={s.id} song={s} theme={theme} cover={cover} onPress={() => playSong(s)} active={currentSong?.id === s.id} />
           ))}
         </div>
       </Section>
+
+      {songs.length === 0 && (
+        <div style={{ textAlign: 'center', color: theme.color.textTertiary, fontSize: 13.5, padding: '60px 0' }}>
+          No songs returned by the server yet.
+        </div>
+      )}
     </div>
   );
 }
@@ -108,28 +111,6 @@ function ListRow({ song, theme, cover, onPress, active }) {
       >
         <Play size={13} fill={theme.color.textPrimary} color={theme.color.textPrimary} style={{ marginLeft: 1 }} />
       </button>
-    </div>
-  );
-}
-
-function ContinueRow({ song, theme, cover, onPress, active }) {
-  const [a, b] = cover(song.coverIdx);
-  return (
-    <div
-      onClick={onPress}
-      style={{
-        display: 'flex', alignItems: 'center', gap: 12, padding: 12, borderRadius: theme.radius.md,
-        background: theme.color.surface, border: `1px solid ${active ? theme.color.accentA : theme.color.border}`, cursor: 'pointer',
-      }}
-    >
-      <div style={{ width: 48, height: 48, borderRadius: 11, background: `linear-gradient(135deg, ${a}, ${b})`, flexShrink: 0 }} />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{song.title}</div>
-        <div style={{ height: 4, background: theme.color.surface2, borderRadius: 2, marginTop: 8, overflow: 'hidden' }}>
-          <div style={{ height: '100%', width: `${song.progress * 100}%`, background: theme.color.gradient, borderRadius: 2 }} />
-        </div>
-      </div>
-      <span style={{ fontSize: 11.5, color: theme.color.textTertiary, flexShrink: 0 }}>{Math.round(song.progress * 100)}%</span>
     </div>
   );
 }

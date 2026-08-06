@@ -212,24 +212,20 @@ def function_for_sign_in(request):
         "message": "Only POST method is allowed"
     }, status=405)
 
-
 def get_data_for_user(request):
     if request.method == "POST":
         try:
             hash_data = request.POST.get("hash_data")
             type_of_hash = request.POST.get("type_of_hash")
-
+            resulted_data = None
             if type_of_hash == "playlist":
-                playlist_data = handle_user_request()
-                resulted_data = playlist_data.get_user_playlist(hash_data)
-            if type_of_hash == "song":
-                song_data = handle_user_request()
-                resulted_data = song_data.get_song_data(hash_data)
-
-            print("UserId",user_hash)
-            print("Data",resulted_data)
-        except:
-            print("data is importent biguluu")
+                resulted_data = handle_user_request().get_user_playlist(hash_data)
+            elif type_of_hash == "song":
+                resulted_data = handle_user_request().get_song_data(hash_data)
+            return JsonResponse({"data": resulted_data}, safe=False)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+    return JsonResponse({"error": "Only POST allowed"}, status=405)
 
 def hash_getter(request):
     if request.method == "POST":

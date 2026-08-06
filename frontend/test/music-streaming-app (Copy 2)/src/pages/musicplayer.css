@@ -1,0 +1,115 @@
+/* musicplayer.css */
+
+.music-player {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #1f1c2c, #928dab);
+  padding: 20px;
+}
+
+
+/* Player card */
+.player-card {
+  width: 380px;
+  padding: 35px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(15px);
+  border-radius: 25px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.35);
+  color: white;
+}
+
+
+/* Song title */
+.player-card h2 {
+  margin: 0 0 12px;
+  font-size: 28px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+
+/* Artist */
+.player-card p {
+  margin: 0 0 30px;
+  font-size: 18px;
+  color: #ddd;
+}
+
+
+/* Button container */
+.controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+
+/* Buttons */
+.controls button {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  background: white;
+  color: #1f1c2c;
+
+  transition: 0.3s ease;
+}
+
+
+.controls button:hover {
+  transform: translateY(-3px);
+  background: #ff4b5c;
+  color: white;
+}
+
+
+/* Play button */
+.play-btn {
+  padding: 14px 28px !important;
+  background: #ff4b5c !important;
+  color: white !important;
+}
+
+
+/* Audio */
+.player-card audio {
+  width: 100%;
+  margin-top: 30px;
+}
+
+
+/* Loading */
+.music-player h3 {
+  color: white;
+  font-size: 25px;
+}
+
+
+/* Mobile */
+@media(max-width:500px){
+
+  .player-card {
+    width: 95%;
+    padding: 25px;
+  }
+
+  .controls {
+    gap: 8px;
+  }
+
+  .controls button {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+}

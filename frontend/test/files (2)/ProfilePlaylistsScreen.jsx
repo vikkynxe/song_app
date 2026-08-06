@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Settings, Plus, MoreVertical, Music2 } from 'lucide-react';
-import { playlists, user } from './mockData';
 
-
-export default function ProfilePlaylistsScreen({ theme, cover }) {
+// NOTE: backend has no playlist-listing or user-profile endpoints
+// yet (only get_user_playlist by hash, unused on the frontend so
+// far, and no /me-style user endpoint). playlists/user are passed
+// in as lightweight placeholders from musicData.js until those
+// endpoints exist. "Create playlist" here only updates local state.
+export default function ProfilePlaylistsScreen({ theme, cover, playlists, user }) {
   const [list, setList] = useState(playlists);
   const [ua, ub] = cover(user.avatarIdx);
 
