@@ -35,7 +35,7 @@ const handleSubmit = async (e) => {
 
       alert("Login Successful!");
       
-      window.location.href = "/MusicPlayer";
+      window.location.href = "/HomePage";
     } else {
       alert(data.message || "Login failed");
     }
