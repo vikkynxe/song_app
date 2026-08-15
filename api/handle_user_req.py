@@ -24,8 +24,8 @@ class handle_user_request():
         rows = self.cursor.fetchall()
 
         for row in rows:
-            print(row)
-
+            pass
+        
         return rows
     
     def get_song_data(self, id_playlist):
@@ -42,3 +42,4 @@ class handle_user_request():
             print("nothing is here need to create")
         
         return row
+    

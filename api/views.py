@@ -57,6 +57,7 @@ def download_song(request):
             "preferredquality": "192",
         }],
     }
+    # yt-dlp -j "https://youtu.be/oafxkMv4xnc" > video.json
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -71,7 +72,7 @@ def download_song(request):
         return Response({"error": str(e)}, status=500)
         
 
-def get_song(request):
+def get_recommendation_song(request):
     a = recommendation.recommend_songs("sodakku", num_recommendations=5)
     print(a)
     raw = a
@@ -83,12 +84,32 @@ def get_song(request):
             "album": item["Album"],
             "match_score": clean_value(item["Match Score"]),
             # add URL if you have it
-            "url": f"http://localhost:8000/media/{item['Song']}.mp3"
+            "url": f"http://localhost:8000/api/audio/{item['Song']}.mp3"
         }
         for item in raw
     ]
     print(cleaned)
     return JsonResponse({"songs": cleaned})
+
+def get_song(request, hash_token):
+
+    print(hash_token)
+
+    class_for_playlist = handle_user_request()
+    data = class_for_playlist.get_user_playlist(hash_token)
+
+    playlist_hash = (data[0][0]).tobytes()
+    
+    playlist_name = data[0][2]
+    
+    print(playlist_hash, playlist_name)
+
+
+    return JsonResponse({
+        "message": "Data received successfully",
+        "data": hash_token
+    })
+
 
 def stream_audio(request, filename):
     path = os.path.join("dbs/music", filename)

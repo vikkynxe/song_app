@@ -262,14 +262,19 @@ class CSV_handler_class():
             
         self.conn.commit()
 
-
-        is_acc_done = self.create_user_acc()
+        if (not ((self.username or self.email or self.password) == '')):
+            is_acc_done = self.create_user_acc()
         
         if is_acc_done:
 
             return JsonResponse({
                 "status": "success",
                 "message": "CSV uploaded successfully, and account also"
+            })
+        if (((self.username or self.email or self.password) == '')):
+            return JsonResponse({
+                "status": "success",
+                "message": "will belive everything is fine"
             })
         
     
@@ -278,9 +283,10 @@ class CSV_handler_class():
             combined_text = "".join([self.hash_id, self.playlist_name])
             user_hash = self.hash_id
         else:
-            combined_text = "".join([self.username,self.password,self.playlist_name])
             combined_string = "".join([self.username, self.password])
             user_hash = hashlib.sha256(combined_string.encode("utf-8")).hexdigest()
+            combined_text = "".join([user_hash,self.playlist_name])
+
 
         playlist_query = "INSERT INTO user_playlists (id_hash, user_hash, playlist_name) VALUES (%s, %s, %s)"
         

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import "./musicplayer.css";
+import "../Style/musicplayer.css";
 
 export default function MusicPlayer() {
   const [songs, setSongs] = useState([]);
