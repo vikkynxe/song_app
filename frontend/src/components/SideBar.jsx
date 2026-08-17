@@ -26,7 +26,7 @@ function SideBarF({ setPage }) {
 
         <li>
           <a href="#" onClick={() => setPage("yourlibrary")}>
-            <i className="fa-solid fa-book"></i> Your Library
+            <i className="fa-solid fa-book"></i> Your Playlist
           </a>
         </li>
       </ul>
@@ -52,9 +52,6 @@ function SideBarF({ setPage }) {
           </a>
         </li>
       </ul>
-
-      <div onClick={() => setPage("playlist")} className="playlists-header">Your Playlists</div>
-
     </aside>
   );
 }

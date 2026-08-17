@@ -265,12 +265,13 @@ class CSV_handler_class():
         if (not ((self.username or self.email or self.password) == '')):
             is_acc_done = self.create_user_acc()
         
-        if is_acc_done:
+            if is_acc_done:
 
-            return JsonResponse({
-                "status": "success",
-                "message": "CSV uploaded successfully, and account also"
-            })
+                return JsonResponse({
+                    "status": "success",
+                    "message": "CSV uploaded successfully, and account also"
+                })
+                
         if (((self.username or self.email or self.password) == '')):
             return JsonResponse({
                 "status": "success",

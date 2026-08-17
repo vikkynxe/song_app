@@ -6,7 +6,7 @@ function BottomPlayerF() {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        `http://localhost:8000/api/songs/${token}`
+        `http://localhost:8000/api/get_songs/${token}`
       );
 
       const data = await response.json();

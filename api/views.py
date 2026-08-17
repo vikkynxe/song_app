@@ -91,23 +91,56 @@ def get_recommendation_song(request):
     print(cleaned)
     return JsonResponse({"songs": cleaned})
 
-def get_song(request, hash_token):
 
-    print(hash_token)
+@csrf_exempt
+def get_playlists(request):
+    if request.method != "POST":
+        return JsonResponse({
+            "message": "Only POST requests are allowed"
+        }, status=405)
 
-    class_for_playlist = handle_user_request()
-    data = class_for_playlist.get_user_playlist(hash_token)
+    hash_token = request.POST.get("hash_id")
+    print("hash_token:", hash_token)
 
-    playlist_hash = (data[0][0]).tobytes()
-    
-    playlist_name = data[0][2]
-    
-    print(playlist_hash, playlist_name)
+    playlists = handle_user_request().get_user_playlist(hash_token)
 
+    print("playlists:", playlists)
+
+    hash_list = []
+    name_list = []
+    no_of_song_track = []
+
+    for item in playlists:
+        playlist_hash = item[0]
+        playlist_name = item[1]
+
+        if isinstance(playlist_hash, bytes):
+            playlist_hash = playlist_hash.decode("utf-8")
+        
+        songcount = handle_user_request().numberofsongsfun(playlist_hash)
+
+        no_of_song_track.append(songcount if songcount != '' else 0)
+
+        if isinstance(playlist_name, bytes):
+            playlist_name = playlist_name.decode("utf-8")
+
+        hash_list.append(playlist_hash)
+        name_list.append(playlist_name)
+
+        print({
+        "message": "Data received successfully",
+        "hash": hash_list,
+        "name": name_list,
+        "tracks": no_of_song_track,
+        "data": bool(playlists)
+    })
 
     return JsonResponse({
         "message": "Data received successfully",
-        "data": hash_token
+        "hash": hash_list,
+        "name": name_list,
+        "tracks": no_of_song_track,
+        "data": bool(playlists)
     })
 
 
@@ -209,8 +242,7 @@ def function_for_sign_in(request):
 
             print(hash_id)
 
-            sign_in_func = handle_user_request()
-            row = sign_in_func.sign_in_function(hash_id)
+            row = handle_user_request().sign_in_function(hash_id)
 
             if row is None:
                 return JsonResponse({
@@ -260,11 +292,14 @@ def hash_getter(request):
             print("nothing new ,...")
             return 0
         
+@csrf_exempt
 def create_playlist(request):
     if request.method == "POST":
         hash_id = request.POST.get("hash_id")
         playlist_name = request.POST.get("playlistname")
         uploaded_csv = request.FILES.get("file")
+
+        print(hash_id, playlist_name)
 
         if uploaded_csv is None:
             return JsonResponse({"error": "No file uploaded"}, status=400)
@@ -301,3 +336,17 @@ def create_playlist(request):
         })
 
     return JsonResponse({"error": "Only POST allowed"}, status=405)
+
+def get_songs(request):
+    if (request.method == "POST"):
+        pl_hash_id = request.POST.get(playlist_hash_id)
+
+        Songs_data = handle_user_request().get_song_data(pl_hash_id)
+
+    return JsonResponse({
+        "message": "File received successfully"
+    })
+
+
+##laast ahh song data get pannalmnnu irukka thookam
+#  varudhu moththtama eduththu send pannitu upgradw pannikalam good night

@@ -27,13 +27,14 @@ const PlaylistUploadForm = () => {
 
     // FormData is required when uploading files via an API
     const formData = new FormData();
-    formData.append('playlistName', playlistName);
+    formData.append('playlistname', playlistName);
     formData.append('file', csvFile);
+    formData.append('hash_id', localStorage.getItem("token"));
 
     try {
       // Example API call (replace with your actual backend endpoint)
-      /*
-      const response = await fetch('/api/upload-playlist', {
+      
+      const response = await fetch('http://localhost:8000/api/create_playlist/', {
         method: 'POST',
         body: formData,
       });
@@ -41,7 +42,7 @@ const PlaylistUploadForm = () => {
       if (response.ok) {
         alert("Playlist uploaded successfully!");
       }
-      */
+      
       
       console.log("Ready to send:", {
         playlistName: formData.get('playlistName'),

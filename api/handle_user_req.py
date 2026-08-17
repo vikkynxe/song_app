@@ -12,25 +12,6 @@ class handle_user_request():
         )
         self.cursor = self.conn.cursor()
 
-    def get_user_playlist(self, id_users):
-        query = """
-            SELECT *
-            FROM user_playlists
-            WHERE user_hash = %s;
-        """
-        user_hash = id_users
-
-        self.cursor.execute(query, (user_hash,))
-        rows = self.cursor.fetchall()
-
-        for row in rows:
-            pass
-        
-        return rows
-    
-    def get_song_data(self, id_playlist):
-        print(id_playlist)
-    
     def sign_in_function(self, hash_id_for_signin):
         self.cursor.execute(
             "SELECT * FROM users_table WHERE hash_id = %s",
@@ -42,4 +23,37 @@ class handle_user_request():
             print("nothing is here need to create")
         
         return row
+
+    def get_user_playlist(self, id_users):
+        query = """
+            SELECT *
+            FROM user_playlists
+            WHERE user_hash = %s;
+        """
+        user_hash = id_users
+
+        self.cursor.execute(query, (user_hash,))
+        rows = self.cursor.fetchall()
+        
+        data = []
+        print("\n\n\n")
+        for row in rows:
+            data.append([row[0].tobytes(),row[2]])
+
+        return data
+
     
+    def numberofsongsfun(self, hash_id):
+        query = """
+            SELECT COUNT(*)
+            FROM playlist_tracks
+            WHERE playlist_id = %s;
+        """
+        print(hash_id)
+        self.cursor.execute(query, (hash_id,))
+        count = self.cursor.fetchone()[0]
+
+        return count
+    
+    def get_song_data(self, id_playlist):
+        print(id_playlist)
