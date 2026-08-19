@@ -56,4 +56,19 @@ class handle_user_request():
         return count
     
     def get_song_data(self, id_playlist):
-        print(id_playlist)
+        query = """
+            SELECT *
+            FROM playlist_tracks
+            WHERE playlist_id = %s;
+        """
+
+        self.cursor.execute(query, (id_playlist,))
+        rows = self.cursor.fetchall()
+        
+        data = []
+        print("\n\n\n")
+        for row in rows:
+            data.append([row[1],row[2]])
+            print(row[2])
+
+        return data

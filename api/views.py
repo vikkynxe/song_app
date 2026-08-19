@@ -337,16 +337,20 @@ def create_playlist(request):
 
     return JsonResponse({"error": "Only POST allowed"}, status=405)
 
+@csrf_exempt
 def get_songs(request):
     if (request.method == "POST"):
-        pl_hash_id = request.POST.get(playlist_hash_id)
+        data = json.loads(request.body)
+        pl_hash_id = data.get("token")
 
+        print(pl_hash_id)
         Songs_data = handle_user_request().get_song_data(pl_hash_id)
-
+    
+    print(Songs_data)
+    
     return JsonResponse({
         "message": "File received successfully"
     })
-
 
 ##laast ahh song data get pannalmnnu irukka thookam
 #  varudhu moththtama eduththu send pannitu upgradw pannikalam good night
