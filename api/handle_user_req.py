@@ -68,7 +68,19 @@ class handle_user_request():
         data = []
         print("\n\n\n")
         for row in rows:
-            data.append([row[1],row[2]])
-            print(row[2])
-
+            data.append(row[2])
         return data
+
+    def get_song_data_from_db(self, id_hash_list):
+        query = """
+            SELECT *
+            FROM user_song_list
+            WHERE track_hash = %s;
+        """
+        data = []
+        for id_hash_item in id_hash_list:
+            self.cursor.execute(query, (id_hash_item,))
+            row = self.cursor.fetchone()
+            data.append(list(row))
+            print(row)
+        return(data)

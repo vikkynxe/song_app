@@ -216,7 +216,15 @@ def create_users(request):
             print("Exception")
             return JsonResponse({"error": "Invalid CSV"}, status=400)
 
-        handle_csv_class = CSV_handler_class(text, username, email, password, dob, about_you, "liked_playlist", '')
+        handle_csv_class = CSV_handler_class(
+            text, 
+            username, 
+            email, 
+            password, 
+            dob, 
+            about_you, 
+            "liked_playlist", ''
+        )
         handle_csv_class.csv_handler()
 
         return JsonResponse({
@@ -326,7 +334,16 @@ def create_playlist(request):
         dob = ''
         about_you = ''
 
-        handle_csv_class = CSV_handler_class(text, username, email, password, dob, about_you, playlist_name, hash_id)
+        handle_csv_class = CSV_handler_class(
+            text, 
+            username, 
+            email, 
+            password, 
+            dob, 
+            about_you, 
+            playlist_name, 
+            hash_id
+        )
         data = handle_csv_class.csv_handler()
 
         print(data)
@@ -334,7 +351,6 @@ def create_playlist(request):
         return JsonResponse({
             "message": "File received successfully"
         })
-
     return JsonResponse({"error": "Only POST allowed"}, status=405)
 
 @csrf_exempt
@@ -345,12 +361,13 @@ def get_songs(request):
 
         print(pl_hash_id)
         Songs_data = handle_user_request().get_song_data(pl_hash_id)
-    
-    print(Songs_data)
-    
+
+        Songs_data_details = handle_user_request().get_song_data_from_db(Songs_data)
+
     return JsonResponse({
-        "message": "File received successfully"
+        "resut": Songs_data,
+        "data": Songs_data_details
     })
 
-##laast ahh song data get pannalmnnu irukka thookam
-#  varudhu moththtama eduththu send pannitu upgradw pannikalam good night
+#laast ahh song data get pannalmnnu irukka thookam
+#varudhu moththtama eduththu send pannitu upgradw pannikalam good night 
