@@ -18,11 +18,8 @@ const PlaylistDashboard = () => {
         const formData = new FormData();
 
         const token = localStorage.getItem("token");
-        console.log("Token:", token);
         
         formData.append("hash_id", token);
-
-        console.log("hash_id:", formData.get("hash_id"));
 
         const response = await fetch('http://localhost:8000/api/get_playlists/', {
           method: 'POST',

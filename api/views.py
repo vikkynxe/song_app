@@ -364,6 +364,11 @@ def get_songs(request):
 
         Songs_data_details = handle_user_request().get_song_data_from_db(Songs_data)
 
+        print({
+        "resut": Songs_data,
+        "data": Songs_data_details
+        })
+
     return JsonResponse({
         "resut": Songs_data,
         "data": Songs_data_details

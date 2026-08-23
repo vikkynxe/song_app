@@ -81,6 +81,10 @@ class handle_user_request():
         for id_hash_item in id_hash_list:
             self.cursor.execute(query, (id_hash_item,))
             row = self.cursor.fetchone()
-            data.append(list(row))
-            print(row)
+            if row:
+                columns = [column[0] for column in self.cursor.description]
+                result = dict(zip(columns, row))
+            else:
+                result = None
+            data.append(result)
         return(data)
