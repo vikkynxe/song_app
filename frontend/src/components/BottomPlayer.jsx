@@ -1,8 +1,17 @@
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 function BottomPlayerF() {
   useEffect(() => {
     async function getSong() {
+      const location = useLocation();
+
+      const myList = location.state?.list;
+      const hash = location.state?.hash;
+    
+      console.log(myList);
+      console.log(hash);
+      
       const token = localStorage.getItem("token");
 
       const response = await fetch(

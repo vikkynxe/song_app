@@ -144,7 +144,7 @@ const PlaylistDashboard = () => {
               You don't have any playlists yet.
             </p>
           ) : (
-            <div style={styles.grid}>
+            <div  style={{...styles.grid}}>
               {playlists.map((playlist) => (
                 <div
                   key={playlist.id}

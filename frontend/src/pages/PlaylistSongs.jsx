@@ -1,9 +1,23 @@
 import { useEffect, useState } from "react";
 import "../Style/PlaylistSongs.css";
+import { useNavigate } from "react-router-dom";
+import BottomPlayerF from "../components/BottomPlayer.jsx"
+
 
 function PlaylistSongsFun({ selectedPlaylist }) {
   const [songs, setSongs] = useState([]);
   const [songs_details, setsongs_details] = useState([]);
+  const navigate = useNavigate();
+
+
+  const handleClick = (key) => {
+    navigate("/BottomPlayerF", {
+      state: {
+        list: songs_details,
+        hash: songs
+      }
+    });
+  };
 
   useEffect(() => {
     async function getSongsFromDB() {
@@ -57,7 +71,7 @@ function PlaylistSongsFun({ selectedPlaylist }) {
 
       <div className="songs-list">
         {songs_details.map((song, index) => (
-          <div className="song-row" key={song.id}>
+          <div className="song-row" key={song.id} onClick={() => handleClick(song.track_hash)} style={{ cursor: "pointer" }} >
             <div className="number">{index + 1}</div>
 
             <div className="song-details">
