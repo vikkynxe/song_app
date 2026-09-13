@@ -41,8 +41,7 @@ class handle_user_request():
             data.append([row[0].tobytes(),row[2]])
 
         return data
-
-    
+ 
     def numberofsongsfun(self, hash_id):
         query = """
             SELECT COUNT(*)

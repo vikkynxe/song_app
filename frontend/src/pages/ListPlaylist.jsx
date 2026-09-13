@@ -32,8 +32,6 @@ const PlaylistDashboard = () => {
 
         const data = await response.json();
         
-        // Assuming the server returns an array of objects:
-        // [{ id: 1, name: "Chill Vibes", tracks: 24, coverUrl: "..." }, ...]
         const playlistData = data.hash.map((hash, index) => ({
           id: hash,
           name: data.name[index],
@@ -46,18 +44,15 @@ const PlaylistDashboard = () => {
       } catch (err) {
         console.error("Error fetching playlists:", err);
         setError(err.message);
-        
-        // MOCK DATA: For demonstration purposes so you can see the UI 
-        // if you run this without a real backend connected yet.
+
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchPlaylists();
-  }, []); // Empty dependency array means this runs once when the page loads
-
-  // Styles matching the dark theme of the music app
+  }, []); 
+  
   const styles = {
     page: {
       padding: '30px',
@@ -123,7 +118,7 @@ const PlaylistDashboard = () => {
       {selectedPlaylist ? (
         <div>
           <button onClick={() => setSelectedPlaylist(null)}>
-            ← Back to playlists
+            ← Back to playlist list
           </button>
 
           <PlaylistSongsFun selectedPlaylist={selectedPlaylist}/>

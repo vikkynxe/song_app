@@ -3,8 +3,7 @@ import Login from "./pages/log_in";
 import MusicPlayer from "./pages/MusicPlayer";
 import HomePage from "./pages/HomePage";
 import CreateAccount from "./pages/CreateAccount";
-import BottomPlayerF from "./components/BottomPlayer";
-
+import AudioPlayer from "./pages/MusicPlayerFromapp";
 
 function App() {
   const isLoggedIn = localStorage.getItem("isLoggedIn");
@@ -14,9 +13,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/create_account" element={<CreateAccount />} />
-        <Route path="/MusicPlayer" element={ isLoggedIn === ("true") ? <MusicPlayer /> : <Navigate to="/" /> } />
         <Route path="/HomePage" element={ isLoggedIn === ("true") ? <HomePage /> : <Navigate to="/" /> } />
-        <Route path="/BottomPlayerF" element={<BottomPlayerF />} />
+        <Route path="/AudioPlayer" element={<AudioPlayer />} />
       </Routes>
     </BrowserRouter>
   );

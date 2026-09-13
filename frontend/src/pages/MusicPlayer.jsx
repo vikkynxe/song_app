@@ -1,41 +1,34 @@
 import React, { useEffect, useRef, useState } from "react";
 import "../Style/musicplayer.css";
+import { useLocation } from "react-router-dom";
+import AudioPlayer from "./MusicPlayerFromapp";
+
+
+function AudioPlayerf({ filename }) {
+  const audioUrl = `http://localhost:8000/api/music/${encodeURIComponent(filename)}`;
+
+  return (
+    <audio controls preload="metadata">
+      <source src={audioUrl} type="audio/mpeg" />
+      Your browser does not support audio playback.
+    </audio>
+  );
+}
+
+
 
 export default function MusicPlayer() {
   const [songs, setSongs] = useState([]);
   const [currentSong, setCurrentSong] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-
   const audioRef = useRef(null);
 
-  // Fetch songs from API
-  const fetchSongs = async () => {
-    try {
-      const response = await fetch("http://localhost:8000/api/songs/");
-      const data = await response.json();
+  const location = useLocation();
 
-      // Assuming the API returns an array of songs
-      setSongs(data);
-      setCurrentSong(0);
-      console.log(data)
-    } catch (error) {
-      console.error("Error fetching songs:", error);
-    }
-  };
+  const { list } = location.state || {};
 
-  // Fetch first batch when component loads
-  useEffect(() => {
-    fetchSongs();
-  }, []);
+  console.log("list:", list);
 
-  // Play/Pause whenever current song changes
-  useEffect(() => {
-    if (!audioRef.current || songs.length === 0) return;
-
-    if (isPlaying) {
-      audioRef.current.play().catch((err) => console.log(err));
-    }
-  }, [currentSong, songs, isPlaying]);
 
   // Play/Pause button
   const togglePlay = () => {
@@ -68,7 +61,7 @@ export default function MusicPlayer() {
   };
 
   if (songs.length === 0) {
-    return <h3>Loading songs...</h3>;
+    return <h3>Loading songs... <AudioPlayer /></h3>;
   }
 
 return (

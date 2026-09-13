@@ -1,22 +1,21 @@
 import { useEffect, useState } from "react";
 import "../Style/PlaylistSongs.css";
 import { useNavigate } from "react-router-dom";
-import BottomPlayerF from "../components/BottomPlayer.jsx"
+import AudioPlayer from "./MusicPlayerFromapp";
 
 
 function PlaylistSongsFun({ selectedPlaylist }) {
   const [songs, setSongs] = useState([]);
   const [songs_details, setsongs_details] = useState([]);
   const navigate = useNavigate();
+  const [Audioplayerornot, setAudioplayerornot] = useState(null);
+
+  console.log(typeof(selectedPlaylist));
 
 
   const handleClick = (key) => {
-    navigate("/BottomPlayerF", {
-      state: {
-        list: songs_details,
-        hash: songs
-      }
-    });
+    setAudioplayerornot(key);
+    //navigate("/AudioPlayer", {state: {list: songs_details}});
   };
 
   useEffect(() => {
@@ -51,6 +50,17 @@ function PlaylistSongsFun({ selectedPlaylist }) {
   }, [selectedPlaylist]);
 
   return (
+    <div>
+    {Audioplayerornot ? (
+          <div>
+            <button onClick={() => setAudioplayerornot(null)}>
+              ← Back to playlists
+            </button>
+            <p>{Audioplayerornot}</p>
+            <AudioPlayer listdata={Audioplayerornot}/>
+  
+          </div>
+        ) : (
     <div className="playlist-container">
       <div className="playlist-header">
         <div className="playlist-icon">♫</div>
@@ -97,6 +107,8 @@ function PlaylistSongsFun({ selectedPlaylist }) {
           </div>
         ))}
       </div>
+    </div>
+    )}
     </div>
   );
 }
