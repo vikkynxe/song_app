@@ -9,13 +9,12 @@ function PlaylistSongsFun({ selectedPlaylist }) {
   const [songs_details, setsongs_details] = useState([]);
   const navigate = useNavigate();
   const [Audioplayerornot, setAudioplayerornot] = useState(null);
-
-  console.log(typeof(selectedPlaylist));
+  const [Audioplayerdata, setAudioplayerdata] = useState(null);
 
 
   const handleClick = (key) => {
     setAudioplayerornot(key);
-    //navigate("/AudioPlayer", {state: {list: songs_details}});
+    setAudioplayerdata(songs_details);
   };
 
   useEffect(() => {
@@ -57,8 +56,7 @@ function PlaylistSongsFun({ selectedPlaylist }) {
               ← Back to playlists
             </button>
             <p>{Audioplayerornot}</p>
-            <AudioPlayer listdata={Audioplayerornot}/>
-  
+            <AudioPlayer Audiohashdata={Audioplayerornot} Audioplayerdata={Audioplayerdata}/>
           </div>
         ) : (
     <div className="playlist-container">

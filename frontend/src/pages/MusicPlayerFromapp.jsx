@@ -1,14 +1,44 @@
 import { useEffect, useRef, useState } from "react";
 
-function AudioPlayer({ filename }) {
+function AudioPlayer({ Audiohashdata, Audioplayerdata }) {
   const audioRef = useRef(null);
 
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
 
-  console.log(typeof(filename));
 
-  const audioUrl = `http://localhost:8000/api/audio/Bairan – Animated Love Story ｜ Banjaare (Official Video) [oafxkMv4xnc].mp3`;
+  const index = Audioplayerdata.findIndex(
+    song => song.track_hash === Audiohashdata
+  );
+
+  
+  console.log(index);
+
+  const current_song = Audioplayerdata[index];
+
+  console.log(current_song);
+
+
+  const handleSongEnded = () => {
+    console.log("Song finished");
+
+    function nextsongorsuffule(){
+      try {
+        index = index +1;
+        Audiohashdata = current_song.track_hash;
+      } catch (error) {
+        index = 0;
+        Audiohashdata = current_song.track_hash;
+        console.log("Something went wrong:", error);
+      } finally {
+        console.log("Finished");
+      }
+    }
+    nextsongorsuffule();
+  };
+  
+
+  const audioUrl = `http://localhost:8000/api/audio/${Audiohashdata}`;
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -34,7 +64,12 @@ function AudioPlayer({ filename }) {
 
   return (
     <div>
-      <audio ref={audioRef} src={audioUrl} />
+      <audio
+        ref={audioRef}
+        src={audioUrl}
+        onEnded={handleSongEnded}
+      />
+
 
       <button onClick={() => audioRef.current.play()}>
         ▶️

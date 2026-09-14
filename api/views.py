@@ -22,14 +22,9 @@ from psycopg2.extras import execute_values
 from psycopg2.errors import UniqueViolation
 
 
-
 @ensure_csrf_cookie
 def csrf(request):
     return JsonResponse({"message": "CSRF cookie set"})
-
-DOWNLOAD_FOLDER = "downloads"
-
-os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
 
 def clean_value(v):
     if isinstance(v, (np.int64, np.int32)):
@@ -37,6 +32,11 @@ def clean_value(v):
     if isinstance(v, (np.float64, np.float32)):
         return float(v)
     return v
+
+
+DOWNLOAD_FOLDER = "downloads"
+os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
+
 
 @api_view(["POST"])
 def download_song(request):
@@ -92,64 +92,32 @@ def get_recommendation_song(request):
     return JsonResponse({"songs": cleaned})
 
 
-@csrf_exempt
-def get_playlists(request):
-    if request.method != "POST":
-        return JsonResponse({
-            "message": "Only POST requests are allowed"
-        }, status=405)
-
-    hash_token = request.POST.get("hash_id")
-    print("hash_token:", hash_token)
-
-    playlists = handle_user_request().get_user_playlist(hash_token)
-
-    print("playlists:", playlists)
-
-    hash_list = []
-    name_list = []
-    no_of_song_track = []
-
-    for item in playlists:
-        playlist_hash = item[0]
-        playlist_name = item[1]
-
-        if isinstance(playlist_hash, bytes):
-            playlist_hash = playlist_hash.decode("utf-8")
-        
-        songcount = handle_user_request().numberofsongsfun(playlist_hash)
-
-        no_of_song_track.append(songcount if songcount != '' else 0)
-
-        if isinstance(playlist_name, bytes):
-            playlist_name = playlist_name.decode("utf-8")
-
-        hash_list.append(playlist_hash)
-        name_list.append(playlist_name)
-
-        print({
-        "message": "Data received successfully",
-        "hash": hash_list,
-        "name": name_list,
-        "tracks": no_of_song_track,
-        "data": bool(playlists)
-    })
-
-    return JsonResponse({
-        "message": "Data received successfully",
-        "hash": hash_list,
-        "name": name_list,
-        "tracks": no_of_song_track,
-        "data": bool(playlists)
-    })
+def download_song_in_path(hash_data):
+    data_list = [hash_data]
+    Songs_data_details = handle_user_request().get_song_data_from_db(data_list)
+    print(Songs_data_details)
+    return "Ok"
 
 
 def stream_audio(request, filename):
+
     path = os.path.join("dbs/music", filename)
+
+    print(path)
+
+    if os.path.exists(path):
+        print("File exists")
+    else:
+        print("File does not exist")
+        download_song_in_path(filename)
+
     file_size = os.path.getsize(path)
 
     range_header = request.META.get("HTTP_RANGE", "").strip()
     content_type = "audio/mpeg"
+
+    print(path)
+
 
     if range_header:
         match = re.match(r"bytes=(\d+)-(\d*)", range_header)
@@ -184,6 +152,7 @@ def stream_audio(request, filename):
     response = FileResponse(open(path, "rb"), content_type=content_type)
     response["Accept-Ranges"] = "bytes"
     return response
+
 
 
 def create_users(request):
@@ -272,6 +241,59 @@ def function_for_sign_in(request):
     return JsonResponse({
         "message": "Only POST method is allowed"
     }, status=405)
+
+@csrf_exempt
+def get_playlists(request):
+    if request.method != "POST":
+        return JsonResponse({
+            "message": "Only POST requests are allowed"
+        }, status=405)
+
+    hash_token = request.POST.get("hash_id")
+    print("hash_token:", hash_token)
+
+    playlists = handle_user_request().get_user_playlist(hash_token)
+
+    print("playlists:", playlists)
+
+    hash_list = []
+    name_list = []
+    no_of_song_track = []
+
+    for item in playlists:
+        playlist_hash = item[0]
+        playlist_name = item[1]
+
+        if isinstance(playlist_hash, bytes):
+            playlist_hash = playlist_hash.decode("utf-8")
+        
+        songcount = handle_user_request().numberofsongsfun(playlist_hash)
+
+        no_of_song_track.append(songcount if songcount != '' else 0)
+
+        if isinstance(playlist_name, bytes):
+            playlist_name = playlist_name.decode("utf-8")
+
+        hash_list.append(playlist_hash)
+        name_list.append(playlist_name)
+
+        print({
+        "message": "Data received successfully",
+        "hash": hash_list,
+        "name": name_list,
+        "tracks": no_of_song_track,
+        "data": bool(playlists)
+    })
+
+    return JsonResponse({
+        "message": "Data received successfully",
+        "hash": hash_list,
+        "name": name_list,
+        "tracks": no_of_song_track,
+        "data": bool(playlists)
+    })
+
+
 
 def get_data_for_user(request):
     if request.method == "POST":
@@ -373,6 +395,3 @@ def get_songs(request):
         "resut": Songs_data,
         "data": Songs_data_details
     })
-
-#laast ahh song data get pannalmnnu irukka thookam
-#varudhu moththtama eduththu send pannitu upgradw pannikalam good night 
