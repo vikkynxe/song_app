@@ -20,11 +20,18 @@ import hashlib
 import psycopg2 
 from psycopg2.extras import execute_values
 from psycopg2.errors import UniqueViolation
+import sys
+sys.path.append("/home/vikky/Desktop/song_app_credentials")
+import drive
 
+
+DOWNLOAD_FOLDER = "downloads"
+os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
 
 @ensure_csrf_cookie
 def csrf(request):
     return JsonResponse({"message": "CSRF cookie set"})
+
 
 def clean_value(v):
     if isinstance(v, (np.int64, np.int32)):
@@ -34,19 +41,13 @@ def clean_value(v):
     return v
 
 
-DOWNLOAD_FOLDER = "downloads"
-os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
-
-
-@api_view(["POST"])
-def download_song(request):
-    url = request.data.get("url")
+def download_song(link_data):
+    url = link_data
 
     if not url:
-        return Response({"error": "URL is required"}, status=400)
+        return "error URL is required"
 
-    file_id = str(uuid.uuid4())
-    output_path = f"{DOWNLOAD_FOLDER}/{file_id}"
+    output_path = f"{DOWNLOAD_FOLDER}/"
 
     ydl_opts = {
         "format": "bestaudio/best",
@@ -62,14 +63,13 @@ def download_song(request):
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
+            
+        drive.upload_file(output_path)
 
-        return Response({
-            "message": "Download complete",
-            "file_id": file_id
-        })
+        return "message Download complete"
 
     except Exception as e:
-        return Response({"error": str(e)}, status=500)
+        return "error happaning"
 
 
 def get_recommendation_song(request):
@@ -92,31 +92,54 @@ def get_recommendation_song(request):
     return JsonResponse({"songs": cleaned})
 
 
-def download_song_in_path(hash_data):
+def get_better_result_yt_dlp(search_query):
+    options = {
+        "quiet": True,
+        "extract_flat": True,
+    }
+
+    with yt_dlp.YoutubeDL(options) as ydl:
+        result = ydl.extract_info(
+            f"ytsearch1:{search_query}",
+            download=False
+        )
+
+    video = result["entries"][0]
+    
+    url = video["url"]
+    print(video["title"])
+    return url
+
+
+def download_song_and_upload_drive(hash_data):
     data_list = [hash_data]
     Songs_data_details = handle_user_request().get_song_data_from_db(data_list)
     print(Songs_data_details)
+
+    search_query = f"{Songs_data_details['track_name']} {Songs_data_details['artist_names']} {Songs_data_details['album_name']}"
+    linkdata = get_better_result_yt_dlp(search_query)
+    print(linkdata)
+
+    download_song(linkdata)
+
+
+    
     return "Ok"
 
 
-def stream_audio(request, filename):
+def stream_audio(request, fileid):
 
-    path = os.path.join("dbs/music", filename)
+    files = drive.search_files(fileid)
 
-    print(path)
-
-    if os.path.exists(path):
-        print("File exists")
-    else:
+    if files == []:
         print("File does not exist")
-        download_song_in_path(filename)
+        download_song_and_upload_drive(fileid)
+
 
     file_size = os.path.getsize(path)
 
     range_header = request.META.get("HTTP_RANGE", "").strip()
     content_type = "audio/mpeg"
-
-    print(path)
 
 
     if range_header:
@@ -152,7 +175,6 @@ def stream_audio(request, filename):
     response = FileResponse(open(path, "rb"), content_type=content_type)
     response["Accept-Ranges"] = "bytes"
     return response
-
 
 
 def create_users(request):
@@ -202,6 +224,7 @@ def create_users(request):
 
     return JsonResponse({"error": "Only POST allowed"}, status=405)
 
+
 @csrf_exempt
 def function_for_sign_in(request):
     if request.method == "POST":
@@ -241,6 +264,7 @@ def function_for_sign_in(request):
     return JsonResponse({
         "message": "Only POST method is allowed"
     }, status=405)
+
 
 @csrf_exempt
 def get_playlists(request):
@@ -294,7 +318,6 @@ def get_playlists(request):
     })
 
 
-
 def get_data_for_user(request):
     if request.method == "POST":
         try:
@@ -310,6 +333,7 @@ def get_data_for_user(request):
             return JsonResponse({"error": str(e)}, status=400)
     return JsonResponse({"error": "Only POST allowed"}, status=405)
 
+
 def hash_getter(request):
     if request.method == "POST":
         try:
@@ -321,7 +345,8 @@ def hash_getter(request):
         except:
             print("nothing new ,...")
             return 0
-        
+
+
 @csrf_exempt
 def create_playlist(request):
     if request.method == "POST":
@@ -374,6 +399,7 @@ def create_playlist(request):
             "message": "File received successfully"
         })
     return JsonResponse({"error": "Only POST allowed"}, status=405)
+
 
 @csrf_exempt
 def get_songs(request):
