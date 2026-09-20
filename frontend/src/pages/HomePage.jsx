@@ -1,6 +1,5 @@
 import { useState } from "react";
 import SideBarF from "../components/SideBar.jsx";
-import BottomPlayerF from "../components/BottomPlayer"
 import "../Style/HomePage.css"
 import PlaylistUploadForm from "../pages/CreatePlaylistPage.jsx"
 import HomePageMain from "./HomePageMain.jsx";
@@ -41,9 +40,7 @@ function HomePage() {
           </div>
         )}
         </div>
-      
-      <BottomPlayerF />
-    </div>
+      </div>
   );
 }
 

@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/log_in";
-import MusicPlayer from "./pages/MusicPlayer";
 import HomePage from "./pages/HomePage";
 import CreateAccount from "./pages/CreateAccount";
 import AudioPlayer from "./pages/MusicPlayerFromapp";

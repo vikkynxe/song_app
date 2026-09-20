@@ -5,7 +5,7 @@ urlpatterns = [
     path("csrf/", csrf),
     path("download/", download_song),
     path("get_playlists/", get_playlists),
-    path("audio/<str:filename>", stream_audio),
+    path("audio/<str:fileid>", stream_audio),
     path("create_users/", create_users),
     path("sign_in/",function_for_sign_in),
     path("get_data_for_user/", get_data_for_user),

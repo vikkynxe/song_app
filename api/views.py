@@ -25,7 +25,7 @@ sys.path.append("/home/vikky/Desktop/song_app_credentials")
 import drive
 
 
-DOWNLOAD_FOLDER = "downloads"
+DOWNLOAD_FOLDER = '/home/vikky/Desktop/song_app/downloads'
 os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
 
 @ensure_csrf_cookie
@@ -39,38 +39,6 @@ def clean_value(v):
     if isinstance(v, (np.float64, np.float32)):
         return float(v)
     return v
-
-
-def download_song(link_data):
-    url = link_data
-
-    if not url:
-        return "error URL is required"
-
-    output_path = f"{DOWNLOAD_FOLDER}/"
-
-    ydl_opts = {
-        "format": "bestaudio/best",
-        "outtmpl": output_path,
-        "postprocessors": [{
-            "key": "FFmpegExtractAudio",
-            "preferredcodec": "mp3",
-            "preferredquality": "192",
-        }],
-    }
-    # yt-dlp -j "https://youtu.be/oafxkMv4xnc" > video.json
-
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
-            
-        drive.upload_file(output_path)
-
-        return "message Download complete"
-
-    except Exception as e:
-        return "error happaning"
-
 
 def get_recommendation_song(request):
     a = recommendation.recommend_songs("sodakku", num_recommendations=5)
@@ -92,6 +60,40 @@ def get_recommendation_song(request):
     return JsonResponse({"songs": cleaned})
 
 
+def download_song(link_data,filename):
+    url = link_data
+
+    if not url:
+        return "error URL is required"
+
+    output_path = f"{DOWNLOAD_FOLDER}/{filename}"
+
+    ydl_opts = {
+        "format": "bestaudio/best",
+        "outtmpl": output_path,
+        "postprocessors": [{
+            "key": "FFmpegExtractAudio",
+            "preferredcodec": "mp3",
+            "preferredquality": "192",
+        }],
+    }
+    # yt-dlp -j "https://youtu.be/oafxkMv4xnc" > video.json
+
+    print("data and script ready pakka")
+
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+            
+        drive.upload_file(output_path+'.mp3')
+
+        return output_path
+
+    except Exception as e:
+        return "error happaning"
+
+
+
 def get_better_result_yt_dlp(search_query):
     options = {
         "quiet": True,
@@ -107,34 +109,35 @@ def get_better_result_yt_dlp(search_query):
     video = result["entries"][0]
     
     url = video["url"]
-    print(video["title"])
     return url
 
-
-def download_song_and_upload_drive(hash_data):
-    data_list = [hash_data]
-    Songs_data_details = handle_user_request().get_song_data_from_db(data_list)
-    print(Songs_data_details)
-
-    search_query = f"{Songs_data_details['track_name']} {Songs_data_details['artist_names']} {Songs_data_details['album_name']}"
-    linkdata = get_better_result_yt_dlp(search_query)
-    print(linkdata)
-
-    download_song(linkdata)
-
-
-    
-    return "Ok"
 
 
 def stream_audio(request, fileid):
 
-    files = drive.search_files(fileid)
+    data_list = [fileid]
+    Songs_data_details = handle_user_request().get_song_data_from_db(data_list)
+    search_query = f"{str(Songs_data_details[0]['track_name'])} {str(Songs_data_details[0]['artist_names'])} {str(Songs_data_details[0]['album_name'])}"
+
+
+    files = drive.search_files(search_query+".mp3")
 
     if files == []:
         print("File does not exist")
-        download_song_and_upload_drive(fileid)
+        linkdata = get_better_result_yt_dlp(search_query)
+        path = download_song(linkdata, search_query)+".mp3"
+        print(path)
+    else:
+        print("file found in drive")
+        path = DOWNLOAD_FOLDER+'/'+search_query+'.mp3'
+        if os.path.exists(path):
+            print("ok no problem")
 
+        else:
+            print(files[0]['id'])
+            drive.download_file(files[0]['id'],path)
+            print("File does not exist")
+        print(files)
 
     file_size = os.path.getsize(path)
 

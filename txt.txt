@@ -1,0 +1,102 @@
+.
+├── api
+│   ├── data_finding_py.py
+│   ├── handle_csv.py
+│   ├── handle_user_req.py
+│   ├── models
+│   │   └── models.py
+│   ├── __pycache__
+│   │   ├── handle_csv.cpython-313.pyc
+│   │   ├── handle_csv.cpython-314.pyc
+│   │   ├── handle_user_req.cpython-313.pyc
+│   │   ├── handle_user_req.cpython-314.pyc
+│   │   ├── recommendation.cpython-313.pyc
+│   │   ├── recommendation.cpython-314.pyc
+│   │   ├── sha_256_hashing.cpython-313.pyc
+│   │   ├── urls.cpython-313.pyc
+│   │   ├── urls.cpython-314.pyc
+│   │   ├── views.cpython-313.pyc
+│   │   └── views.cpython-314.pyc
+│   ├── recommendation.py
+│   ├── removing_unwanted_data.py
+│   ├── sha_256_hashing.py
+│   ├── temprory.py
+│   ├── urls.py
+│   ├── views.py
+│   └── yt_link_getter.py
+├── dbs
+│   ├── filtered_output.csv
+│   ├── Liked_Songs.csv
+│   ├── Love_less.csv
+│   ├── Motivational_songs_tamil.csv
+│   ├── music
+│   │   ├── Bairan – Animated Love Story ｜ Banjaare (Official Video) [oafxkMv4xnc].mp3
+│   │   └── video.json
+│   ├── original
+│   │   └── spotify_tracks.csv
+│   ├── preparation_songs.py
+│   ├── Sad.csv
+│   └── Sad_Songs_2023.csv
+├── db.sqlite3
+├── downloads
+├── frontend
+│   ├── dist
+│   │   ├── assets
+│   │   │   ├── index-BquSxqTn.css
+│   │   │   └── index-CbDxDOtn.js
+│   │   └── index.html
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── node_modules
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── public
+│   ├── README.md
+│   ├── src
+│   │   ├── App.jsx
+│   │   ├── assets
+│   │   ├── components
+│   │   │   ├── BottomPlayer.jsx
+│   │   │   └── SideBar.jsx
+│   │   ├── main.jsx
+│   │   ├── pages
+│   │   │   ├── CreateAccount.jsx
+│   │   │   ├── CreatePlaylistPage.jsx
+│   │   │   ├── HomePage.jsx
+│   │   │   ├── HomePageMain.jsx
+│   │   │   ├── ListPlaylist.jsx
+│   │   │   ├── log_in.jsx
+│   │   │   ├── MusicPlayerFromapp.jsx
+│   │   │   ├── MusicPlayer.jsx
+│   │   │   └── PlaylistSongs.jsx
+│   │   └── Style
+│   │       ├── HomePage.css
+│   │       ├── log_in.css
+│   │       ├── musicplayer.css
+│   │       └── PlaylistSongs.css
+│   ├── src.zip
+│   └── vite.config.js
+├── LICENSE
+├── manage.py
+├── package.json
+├── package-lock.json
+├── README.md
+├── Song_downloading_application
+│   ├── asgi.py
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-313.pyc
+│   │   ├── __init__.cpython-314.pyc
+│   │   ├── settings.cpython-313.pyc
+│   │   ├── settings.cpython-314.pyc
+│   │   ├── urls.cpython-313.pyc
+│   │   ├── urls.cpython-314.pyc
+│   │   ├── wsgi.cpython-313.pyc
+│   │   └── wsgi.cpython-314.pyc
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── testing
+└── txt.txt
+
+497 directories, 8463 files
