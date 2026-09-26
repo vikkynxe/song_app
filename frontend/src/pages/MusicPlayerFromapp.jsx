@@ -7,7 +7,7 @@ function AudioPlayer({ Audiohashdata, Audioplayerdata }) {
   const [currentTime, setCurrentTime] = useState(0);
 
 
-  const index = Audioplayerdata.findIndex(
+  let index = Audioplayerdata.findIndex(
     song => song.track_hash === Audiohashdata
   );
 

@@ -23,6 +23,8 @@ from psycopg2.errors import UniqueViolation
 import sys
 sys.path.append("/home/vikky/Desktop/song_app_credentials")
 import drive
+import threading
+
 
 
 DOWNLOAD_FOLDER = '/home/vikky/Desktop/song_app/downloads'
@@ -42,7 +44,6 @@ def clean_value(v):
 
 def get_recommendation_song(request):
     a = recommendation.recommend_songs("sodakku", num_recommendations=5)
-    print(a)
     raw = a
     cleaned = [
         {
@@ -56,7 +57,6 @@ def get_recommendation_song(request):
         }
         for item in raw
     ]
-    print(cleaned)
     return JsonResponse({"songs": cleaned})
 
 
@@ -79,18 +79,20 @@ def download_song(link_data,filename):
     }
     # yt-dlp -j "https://youtu.be/oafxkMv4xnc" > video.json
 
-    print("data and script ready pakka")
-
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
-            
-        drive.upload_file(output_path+'.mp3')
+
+        thread = threading.Thread(
+            target=drive.upload_file,
+            args=(output_path+'.mp3',)
+        )
+        thread.start()
 
         return output_path
 
     except Exception as e:
-        return "error happaning"
+        return "error happaning",e
 
 
 
@@ -116,28 +118,23 @@ def get_better_result_yt_dlp(search_query):
 def stream_audio(request, fileid):
 
     data_list = [fileid]
-    Songs_data_details = handle_user_request().get_song_data_from_db(data_list)
-    search_query = f"{str(Songs_data_details[0]['track_name'])} {str(Songs_data_details[0]['artist_names'])} {str(Songs_data_details[0]['album_name'])}"
 
+    Songs_data_details = handle_user_request().get_song_data_from_db(data_list)
+    print(Songs_data_details)
+    search_query = f"{str(Songs_data_details[0]['track_name'])} {str(Songs_data_details[0]['artist_names'])} {str(Songs_data_details[0]['album_name'])}"
 
     files = drive.search_files(search_query+".mp3")
 
+
     if files == []:
-        print("File does not exist")
         linkdata = get_better_result_yt_dlp(search_query)
         path = download_song(linkdata, search_query)+".mp3"
-        print(path)
     else:
-        print("file found in drive")
         path = DOWNLOAD_FOLDER+'/'+search_query+'.mp3'
         if os.path.exists(path):
             print("ok no problem")
-
         else:
-            print(files[0]['id'])
             drive.download_file(files[0]['id'],path)
-            print("File does not exist")
-        print(files)
 
     file_size = os.path.getsize(path)
 
@@ -179,7 +176,7 @@ def stream_audio(request, fileid):
     response["Accept-Ranges"] = "bytes"
     return response
 
-
+@csrf_exempt
 def create_users(request):
     if request.method == "POST":
         username = request.POST.get("username")
@@ -195,7 +192,6 @@ def create_users(request):
             return JsonResponse({"error": "No file uploaded"}, status=400)
 
         if(uploaded_csv.size > (30 * 1024 * 1024)):
-            print("Not Okay")
             return JsonResponse({"error": "File too large"}, status=400)
         
         if Path(uploaded_csv.name).suffix.lower() != ".csv":
@@ -237,13 +233,9 @@ def function_for_sign_in(request):
             user_name = data.get("user_name")
             password = data.get("password")
 
-            print("user_name:", user_name)
-            print("Password:", password)
 
             combined_string = "".join([user_name, password])
             hash_id = hashlib.sha256(combined_string.encode("utf-8")).hexdigest()
-
-            print(hash_id)
 
             row = handle_user_request().sign_in_function(hash_id)
 
@@ -252,7 +244,7 @@ def function_for_sign_in(request):
                     "message": "No Account Found"
                 }, status=400)
             else:
-                print("Data found:", row)
+                print("Data found")
 
             return JsonResponse({
                 "message": "Login data received",
@@ -277,11 +269,8 @@ def get_playlists(request):
         }, status=405)
 
     hash_token = request.POST.get("hash_id")
-    print("hash_token:", hash_token)
 
     playlists = handle_user_request().get_user_playlist(hash_token)
-
-    print("playlists:", playlists)
 
     hash_list = []
     name_list = []
@@ -304,13 +293,13 @@ def get_playlists(request):
         hash_list.append(playlist_hash)
         name_list.append(playlist_name)
 
-        print({
-        "message": "Data received successfully",
-        "hash": hash_list,
-        "name": name_list,
-        "tracks": no_of_song_track,
-        "data": bool(playlists)
-    })
+    #     print({
+    #     "message": "Data received successfully",
+    #     "hash": hash_list,
+    #     "name": name_list,
+    #     "tracks": no_of_song_track,
+    #     "data": bool(playlists)
+    # })
 
     return JsonResponse({
         "message": "Data received successfully",
@@ -357,13 +346,10 @@ def create_playlist(request):
         playlist_name = request.POST.get("playlistname")
         uploaded_csv = request.FILES.get("file")
 
-        print(hash_id, playlist_name)
-
         if uploaded_csv is None:
             return JsonResponse({"error": "No file uploaded"}, status=400)
 
         if(uploaded_csv.size > (30 * 1024 * 1024)):
-            print("Not Okay")
             return JsonResponse({"error": "File too large"}, status=400)
         
         if Path(uploaded_csv.name).suffix.lower() != ".csv":
@@ -396,8 +382,6 @@ def create_playlist(request):
         )
         data = handle_csv_class.csv_handler()
 
-        print(data)
-
         return JsonResponse({
             "message": "File received successfully"
         })
@@ -410,15 +394,14 @@ def get_songs(request):
         data = json.loads(request.body)
         pl_hash_id = data.get("token")
 
-        print(pl_hash_id)
         Songs_data = handle_user_request().get_song_data(pl_hash_id)
 
         Songs_data_details = handle_user_request().get_song_data_from_db(Songs_data)
 
-        print({
-        "resut": Songs_data,
-        "data": Songs_data_details
-        })
+        # print({
+        # "resut": Songs_data,
+        # "data": Songs_data_details
+        # })
 
     return JsonResponse({
         "resut": Songs_data,

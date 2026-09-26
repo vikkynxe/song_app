@@ -86,12 +86,12 @@ class CSV_handler_class():
                 ),
             )
             self.conn.commit()
-            print(hash_id,
-                    self.username,
-                    self.email,
-                    self.password,
-                    self.dob,
-                    self.about_you)
+            # print(hash_id,
+            #         self.username,
+            #         self.email,
+            #         self.password,
+            #         self.dob,
+            #         self.about_you)
 
         except UniqueViolation:
             print("maan you have already accunt")
@@ -108,6 +108,9 @@ class CSV_handler_class():
         reader = csv.reader(self.text_from_view)
 
         header = next(reader)
+
+        print('\n\n\n header',header,'\n\n\n')
+        print(reader)
 
         missing = set(self.required) - set(header[1:])
 
@@ -146,15 +149,15 @@ class CSV_handler_class():
         )
         VALUES %s"""
 
-        try:
-            release_data = f"{int(row[header.index('Release Date')])}-01-01"
-        except:
-            release_data = f'{1800}-01-01'
 
         
         playlist_hash = self.playlist_creater()
-
+        a = 0
         for row in reader:
+            try:
+                release_data = f"{int(row[header.index('Release Date')])}-01-01"
+            except:
+                release_data = f'{1800}-01-01'
             combined = "".join([
                 row[header.index("Track Name")],
                 row[header.index("Album Name")],
@@ -164,12 +167,17 @@ class CSV_handler_class():
                 row[header.index("Record Label")],
             ])
 
+
+
+            print(row)
             # create hash
             hash_value = hashlib.sha256(
                 combined.encode("utf-8")
             ).hexdigest()
             query_for_link = f"INSERT INTO playlist_tracks (playlist_id, song_id) VALUES ('{playlist_hash}', '{hash_value}')"
             self.cursor.execute(query_for_link)
+
+            self.cursor.execute("SAVEPOINT user_song_list_insert")
 
             data.append((
                 hash_value,
@@ -198,9 +206,14 @@ class CSV_handler_class():
                 row[header.index("Time Signature")],
             ))
             try:
+                print(data)
+                a = a + 1
+                print(a)
                 execute_values(self.cursor, query, data)
+                self.cursor.execute("RELEASE SAVEPOINT user_song_list_insert")
                 data=[]
             except UniqueViolation:
+                print("exception")
                 update_query = """
                     UPDATE user_song_list
                     SET
@@ -256,9 +269,11 @@ class CSV_handler_class():
                     row[header.index("Time Signature")],
                     hash_value,
                 ]
-                self.conn.rollback()
+                self.cursor.execute("ROLLBACK TO SAVEPOINT user_song_list_insert")
                 self.cursor.execute(update_query, update_value)
                 data=[]
+            except Exception as e:
+                print("here is the problem:", e)
             
         self.conn.commit()
 

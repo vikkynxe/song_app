@@ -36,7 +36,6 @@ class handle_user_request():
         rows = self.cursor.fetchall()
         
         data = []
-        print("\n\n\n")
         for row in rows:
             data.append([row[0].tobytes(),row[2]])
 
@@ -48,7 +47,6 @@ class handle_user_request():
             FROM playlist_tracks
             WHERE playlist_id = %s;
         """
-        print(hash_id)
         self.cursor.execute(query, (hash_id,))
         count = self.cursor.fetchone()[0]
 
@@ -65,7 +63,6 @@ class handle_user_request():
         rows = self.cursor.fetchall()
         
         data = []
-        print("\n\n\n")
         for row in rows:
             data.append(row[2])
         return data
