@@ -24,11 +24,16 @@ import sys
 sys.path.append("/home/vikky/Desktop/song_app_credentials")
 import drive
 import threading
-
+import subprocess
+import queue
+from .worker import normalization_queue
 
 
 DOWNLOAD_FOLDER = '/home/vikky/Desktop/song_app/downloads'
 os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
+
+normalization_queue = queue.Queue()
+
 
 @ensure_csrf_cookie
 def csrf(request):
@@ -60,46 +65,60 @@ def get_recommendation_song(request):
     return JsonResponse({"songs": cleaned})
 
 
-def download_song(link_data,filename):
+def download_song(link_data, filename):
     url = link_data
 
     if not url:
-        return "error URL is required"
+        return "error: URL is required"
 
     output_path = f"{DOWNLOAD_FOLDER}/{filename}"
 
     ydl_opts = {
         "format": "bestaudio/best",
         "outtmpl": output_path,
+
         "postprocessors": [{
             "key": "FFmpegExtractAudio",
             "preferredcodec": "mp3",
             "preferredquality": "192",
         }],
     }
-    # yt-dlp -j "https://youtu.be/oafxkMv4xnc" > video.json
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
 
-        thread = threading.Thread(
-            target=drive.upload_file,
-            args=(output_path+'.mp3',)
-        )
-        thread.start()
+        mp3_file = output_path + ".mp3"
 
+        # Put normalization into background queue
+        normalization_queue.put(mp3_file)
+
+        print("Downloaded:", mp3_file)
+        print("Added to normalization queue")
+
+        # Return immediately
         return output_path
 
     except Exception as e:
-        return "error happaning",e
+        print("Download error:", e)
+        return f"error: {str(e)}"
 
 
+def clean_text(text):
+    # Replace special characters with a space
+    text = re.sub(r'[^a-zA-Z0-9\s]', ' ', text)
+
+    # Replace multiple spaces with a single space
+    text = re.sub(r'\s+', ' ', text)
+
+    # Remove leading/trailing spaces
+    return text.strip()
 
 def get_better_result_yt_dlp(search_query):
     options = {
         "quiet": True,
         "extract_flat": True,
+        "cookiesfrombrowser": ("chrome",),
     }
 
     with yt_dlp.YoutubeDL(options) as ydl:
@@ -108,27 +127,51 @@ def get_better_result_yt_dlp(search_query):
             download=False
         )
 
+    print(result)
+
+    print(type(result))
+
+    if result["entries"] == []:
+        words = search_query.split()
+        search_query = " ".join(words[:5])
+        with yt_dlp.YoutubeDL(options) as ydl:
+            result = ydl.extract_info(
+                f"ytsearch1:{search_query}",
+                download=False
+            )
+
     video = result["entries"][0]
-    
+
     url = video["url"]
     return url
 
 
 
 def stream_audio(request, fileid):
-
     data_list = [fileid]
 
+    print("request recieved")
     Songs_data_details = handle_user_request().get_song_data_from_db(data_list)
-    print(Songs_data_details)
-    search_query = f"{str(Songs_data_details[0]['track_name'])} {str(Songs_data_details[0]['artist_names'])} {str(Songs_data_details[0]['album_name'])}"
+    print("song detiles got", Songs_data_details)
+    search_query = f"{str(Songs_data_details[0]['track_name'])} {str(Songs_data_details[0]['artist_names'])} lyrics song"
+    search_query = clean_text(search_query)
+    print("search details prepaed", search_query)
 
-    files = drive.search_files(search_query+".mp3")
+    #files = drive.search_files(search_query+".mp3") #remove cammend if u want drive connection
+    files =[]
 
 
     if files == []:
-        linkdata = get_better_result_yt_dlp(search_query)
-        path = download_song(linkdata, search_query)+".mp3"
+        path = DOWNLOAD_FOLDER+'/'+search_query+'.mp3'
+        if os.path.exists(path):
+            print("ok no problem")
+        else:
+            print("getting result")
+            linkdata = get_better_result_yt_dlp(search_query)
+            print("link data got",linkdata)
+
+            path = download_song(linkdata, search_query)+".mp3"
+            
     else:
         path = DOWNLOAD_FOLDER+'/'+search_query+'.mp3'
         if os.path.exists(path):
