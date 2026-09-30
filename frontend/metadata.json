@@ -1,0 +1,6 @@
+{
+  "name": "Aura Music Player",
+  "description": "A premium, glassmorphic modern music streaming application with playlist management, dynamic playback, and seamless audio controls.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

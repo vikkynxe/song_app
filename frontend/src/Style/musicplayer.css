@@ -1,115 +1,92 @@
-/* musicplayer.css */
-
-.music-player {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(135deg, #1f1c2c, #928dab);
-  padding: 20px;
+/* Audio Player & Bottom Player Styling */
+.bottom-player-surface {
+  background: rgba(14, 17, 26, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.6);
 }
 
-
-/* Player card */
-.player-card {
-  width: 380px;
-  padding: 35px;
-  text-align: center;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(15px);
-  border-radius: 25px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.35);
-  color: white;
+.vinyl-record {
+  border-radius: 9999px;
+  background: radial-gradient(circle, #1a1c23 0%, #0d0e12 50%, #050608 100%);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+  position: relative;
 }
 
-
-/* Song title */
-.player-card h2 {
-  margin: 0 0 12px;
-  font-size: 28px;
-  font-weight: 700;
-  text-transform: capitalize;
+.vinyl-grooves {
+  position: absolute;
+  inset: 12px;
+  border-radius: 9999px;
+  border: 1px dashed rgba(255, 255, 255, 0.08);
+  pointer-events: none;
 }
 
-
-/* Artist */
-.player-card p {
-  margin: 0 0 30px;
-  font-size: 18px;
-  color: #ddd;
+.vinyl-grooves-inner {
+  position: absolute;
+  inset: 28px;
+  border-radius: 9999px;
+  border: 1px dashed rgba(255, 255, 255, 0.06);
+  pointer-events: none;
 }
 
-
-/* Button container */
-.controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
+@keyframes spinRecord {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
+.spinning-vinyl {
+  animation: spinRecord 18s linear infinite;
+}
 
-/* Buttons */
-.controls button {
-  padding: 12px 18px;
-  border: none;
-  border-radius: 50px;
+.paused-vinyl {
+  animation-play-state: paused;
+}
+
+/* Custom range sliders */
+input[type="range"].music-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  outline: none;
   cursor: pointer;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  background: white;
-  color: #1f1c2c;
-
-  transition: 0.3s ease;
+  height: 4px;
+  transition: height 0.15s ease, background 0.15s ease;
 }
 
-
-.controls button:hover {
-  transform: translateY(-3px);
-  background: #ff4b5c;
-  color: white;
+input[type="range"].music-slider:hover {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.22);
 }
 
-
-/* Play button */
-.play-btn {
-  padding: 14px 28px !important;
-  background: #ff4b5c !important;
-  color: white !important;
+input[type="range"].music-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: transform 0.15s ease;
 }
 
-
-/* Audio */
-.player-card audio {
-  width: 100%;
-  margin-top: 30px;
+input[type="range"].music-slider:hover::-webkit-slider-thumb {
+  transform: scale(1.25);
+  background: #818cf8;
 }
 
-
-/* Loading */
-.music-player h3 {
-  color: white;
-  font-size: 25px;
-}
-
-
-/* Mobile */
-@media(max-width:500px){
-
-  .player-card {
-    width: 95%;
-    padding: 25px;
-  }
-
-  .controls {
-    gap: 8px;
-  }
-
-  .controls button {
-    padding: 10px 12px;
-    font-size: 12px;
-  }
-
+input[type="range"].music-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  background: #ffffff;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
 }

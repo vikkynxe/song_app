@@ -1,8 +1,5 @@
 import os
-import uuid
 from django.http import FileResponse, JsonResponse, StreamingHttpResponse, HttpResponse
-from django.http import HttpResponse
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import yt_dlp
 import re
@@ -20,19 +17,14 @@ import hashlib
 import psycopg2 
 from psycopg2.extras import execute_values
 from psycopg2.errors import UniqueViolation
-import sys
-sys.path.append("/home/vikky/Desktop/song_app_credentials")
+import sys 
+sys.path.append("/home/vikky/Desktop/song_app_credentials") #idhu inga dhaa irukkanum  for drive 
 import drive
-import threading
 import subprocess
-import queue
-from .worker import normalization_queue
-
 
 DOWNLOAD_FOLDER = '/home/vikky/Desktop/song_app/downloads'
 os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
 
-normalization_queue = queue.Queue()
 
 
 @ensure_csrf_cookie
@@ -64,6 +56,24 @@ def get_recommendation_song(request):
     ]
     return JsonResponse({"songs": cleaned})
 
+def normalize_audio(input_file, output_file):
+    try:
+        subprocess.run([
+            "ffmpeg",
+            "-y",
+            "-i", input_file,
+            "-af", "loudnorm=I=-14:TP=-1.5:LRA=11",
+            "-c:a", "libmp3lame",
+            "-b:a", "192k",
+            output_file
+        ], check=True)
+
+        # Replace original with normalized version
+        os.replace(output_file, input_file)
+
+    except Exception as e:
+        print(f"Normalization error: {e}")
+
 
 def download_song(link_data, filename):
     url = link_data
@@ -90,17 +100,15 @@ def download_song(link_data, filename):
 
         mp3_file = output_path + ".mp3"
 
-        # Put normalization into background queue
-        normalization_queue.put(mp3_file)
-
-        print("Downloaded:", mp3_file)
-        print("Added to normalization queue")
+        normalization_output_path = output_path + "norm.mp3"
+        
+        normalize_audio(mp3_file,normalization_output_path)
 
         # Return immediately
         return output_path
 
     except Exception as e:
-        print("Download error:", e)
+        print("\033[91mDownload error in yt-dlp:", e, "\033[0m")
         return f"error: {str(e)}"
 
 
@@ -127,9 +135,6 @@ def get_better_result_yt_dlp(search_query):
             download=False
         )
 
-    print(result)
-
-    print(type(result))
 
     if result["entries"] == []:
         words = search_query.split()
@@ -145,30 +150,22 @@ def get_better_result_yt_dlp(search_query):
     url = video["url"]
     return url
 
-
-
-def stream_audio(request, fileid):
+def handlling_song(fileid):
     data_list = [fileid]
 
-    print("request recieved")
     Songs_data_details = handle_user_request().get_song_data_from_db(data_list)
-    print("song detiles got", Songs_data_details)
     search_query = f"{str(Songs_data_details[0]['track_name'])} {str(Songs_data_details[0]['artist_names'])} lyrics song"
     search_query = clean_text(search_query)
-    print("search details prepaed", search_query)
 
-    #files = drive.search_files(search_query+".mp3") #remove cammend if u want drive connection
+    #files = drive.search_files(search_query+".mp3") #remove cammend if u want drive connection and remove this     files =[]
     files =[]
-
 
     if files == []:
         path = DOWNLOAD_FOLDER+'/'+search_query+'.mp3'
         if os.path.exists(path):
             print("ok no problem")
         else:
-            print("getting result")
             linkdata = get_better_result_yt_dlp(search_query)
-            print("link data got",linkdata)
 
             path = download_song(linkdata, search_query)+".mp3"
             
@@ -178,6 +175,42 @@ def stream_audio(request, fileid):
             print("ok no problem")
         else:
             drive.download_file(files[0]['id'],path)
+    return path
+        
+@csrf_exempt
+def prepar_song_befor(request):
+    if request.method != "POST":
+        return JsonResponse(
+            {"success": False, "error": "POST request required"},
+            status=405
+        )
+
+    try:
+        data = json.loads(request.body)
+
+        track_hash = data.get("track_hash")
+        current_time = data.get("currentTime")
+        duration = data.get("duration")
+        percentage = data.get("percentage")
+
+        print("track_hash:", track_hash)
+        print("current_time:", current_time)
+        print("duration:", duration)
+        print("percentage:", percentage)
+
+        # handlling_song(...)  # use your data here
+
+        return JsonResponse({"success": True}, status=200)
+
+    except json.JSONDecodeError:
+        return JsonResponse(
+            {"success": False, "error": "Invalid JSON"},
+            status=400
+        )
+
+
+def stream_audio(request, fileid):
+    path = handlling_song(fileid)
 
     file_size = os.path.getsize(path)
 
